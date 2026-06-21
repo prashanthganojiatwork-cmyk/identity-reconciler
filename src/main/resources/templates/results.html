@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Identity Reconciler - Results')}">
+    <title>Identity Reconciler - Results</title>
+</head>
+<body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <nav th:replace="~{fragments/layout :: nav}"></nav>
+
+    <main>
+        <div class="card">
+            <h2 class="card-title">Reconciliation Results</h2>
+            <p style="color: var(--color-text-light); font-size: 0.875rem;">
+                Results for job: <span th:text="${response.jobId()}"></span>
+            </p>
+            <!-- Full results template will be implemented in task 10.3 -->
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

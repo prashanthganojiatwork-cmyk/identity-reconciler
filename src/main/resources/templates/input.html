@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Identity Reconciler - Input')}">
+    <title>Identity Reconciler - Input</title>
+</head>
+<body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <nav th:replace="~{fragments/layout :: nav}"></nav>
+
+    <main>
+        <div class="card">
+            <h2 class="card-title">Reconcile Person Records</h2>
+            <p style="color: var(--color-text-light); margin-bottom: 1rem; font-size: 0.875rem;">
+                Paste JSON arrays of person records from two sources to identify matches between them.
+            </p>
+
+            <!-- Error message display -->
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+            <form method="POST" th:action="@{/ui/reconcile}">
+                <!-- Source A Textarea -->
+                <div class="form-group">
+                    <label for="sourceAJson">Source A Records (JSON)</label>
+                    <textarea id="sourceAJson" name="sourceAJson" rows="8"
+                              th:text="${sourceAJson}"
+                              placeholder='[{"id":"1","firstname":"John","lastname":"Smith","phone":"2065551234","email":"john@example.com","dateOfBirth":"1990-05-15","address":{"streetLine1":"100 Main St","city":"Seattle","stateCode":"WA","postalCode":"98101"}}]'></textarea>
+                </div>
+
+                <!-- Source B Textarea -->
+                <div class="form-group">
+                    <label for="sourceBJson">Source B Records (JSON)</label>
+                    <textarea id="sourceBJson" name="sourceBJson" rows="8"
+                              th:text="${sourceBJson}"
+                              placeholder='[{"id":"A1","firstname":"Jon","lastname":"Smith","phone":"(206) 555-1234","email":"john+work@example.com","dateOfBirth":"05/15/1990","address":{"streetLine1":"100 Main Street","city":"Seattle","stateCode":"WA","postalCode":"98101"}}]'></textarea>
+                </div>
+
+                <!-- Threshold Configuration -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="matchThreshold">Match Threshold</label>
+                        <input type="number" id="matchThreshold" name="matchThreshold"
+                               th:value="${matchThreshold != null ? matchThreshold : 0.7}"
+                               min="0" max="1" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label for="reviewBandLowerBound">Review Band Lower Bound</label>
+                        <input type="number" id="reviewBandLowerBound" name="reviewBandLowerBound"
+                               th:value="${reviewBandLowerBound != null ? reviewBandLowerBound : 0.4}"
+                               min="0" max="1" step="0.01" />
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" class="btn btn-primary">Reconcile</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
