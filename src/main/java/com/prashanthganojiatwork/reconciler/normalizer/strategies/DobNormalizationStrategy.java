@@ -38,32 +38,32 @@ public class DobNormalizationStrategy {
     private static final List<DateTimeFormatter> PARSERS = List.of(
         // "YYYY-MM-DD" (ISO 8601 - already canonical)
         new DateTimeFormatterBuilder()
-            .appendPattern("yyyy-MM-dd")
+            .appendPattern("uuuu-MM-dd")
             .toFormatter(Locale.US)
             .withResolverStyle(ResolverStyle.STRICT),
 
         // "YYYY/MM/DD"
         new DateTimeFormatterBuilder()
-            .appendPattern("yyyy/MM/dd")
+            .appendPattern("uuuu/MM/dd")
             .toFormatter(Locale.US)
             .withResolverStyle(ResolverStyle.STRICT),
 
         // "MM/DD/YYYY" and "M/D/YYYY" (single-digit month/day)
         new DateTimeFormatterBuilder()
-            .appendPattern("M/d/yyyy")
+            .appendPattern("M/d/uuuu")
             .toFormatter(Locale.US)
             .withResolverStyle(ResolverStyle.STRICT),
 
         // "DD-MM-YYYY"
         new DateTimeFormatterBuilder()
-            .appendPattern("dd-MM-yyyy")
+            .appendPattern("dd-MM-uuuu")
             .toFormatter(Locale.US)
             .withResolverStyle(ResolverStyle.STRICT),
 
         // "Month DD, YYYY" (e.g., "January 5, 1990")
         new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
-            .appendPattern("MMMM d, yyyy")
+            .appendPattern("MMMM d, uuuu")
             .toFormatter(Locale.US)
             .withResolverStyle(ResolverStyle.STRICT)
     );

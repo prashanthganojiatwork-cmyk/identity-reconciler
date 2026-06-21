@@ -16,8 +16,12 @@ import java.util.Map;
  *   <li>Trim leading/trailing whitespace</li>
  *   <li>Retain hyphens and apostrophes (meaningful characters)</li>
  *   <li>Remove periods (e.g., "Jr." → "Jr")</li>
- *   <li>Nickname resolution via configurable dictionary</li>
  * </ul>
+ *
+ * <p>Nickname resolution is NOT performed during normalization to preserve original
+ * name information. The nickname dictionary is available via {@link #getCanonicalName(String)}
+ * for use in the comparator phase (NameSimilarityStrategy) where it produces a
+ * similarity score with an explanation rather than destroying information.</p>
  *
  * <p>Satisfies Requirements 2.1 and 2.7.</p>
  */
@@ -27,6 +31,7 @@ public class NameNormalizationStrategy {
 
     /**
      * Constructs the strategy, loading the nickname dictionary from the classpath resource.
+     * The dictionary is kept for use by {@link #getCanonicalName(String)} in the comparator phase.
      */
     public NameNormalizationStrategy() {
         this.nicknameDictionary = loadNicknameDictionary("nicknames.json");
@@ -34,6 +39,7 @@ public class NameNormalizationStrategy {
 
     /**
      * Constructs the strategy with a custom nickname dictionary.
+     * The dictionary is kept for use by {@link #getCanonicalName(String)} in the comparator phase.
      *
      * @param nicknameDictionary a map from lowercase nickname/canonical to the canonical form
      */
@@ -42,7 +48,9 @@ public class NameNormalizationStrategy {
     }
 
     /**
-     * Normalizes a raw name value.
+     * Normalizes a raw name value by applying lowercase, removing periods,
+     * collapsing whitespace, and trimming. Does NOT resolve nicknames — that
+     * belongs in the comparator phase.
      *
      * @param rawName the raw name string (may be null or empty)
      * @return the normalized name, or null if input is null, or empty string if input is blank
@@ -68,32 +76,22 @@ public class NameNormalizationStrategy {
         // 4. Trim leading and trailing whitespace
         result = result.trim();
 
-        // 5. Resolve nicknames — apply to each word token individually
-        result = resolveNicknames(result);
-
         return result;
     }
 
     /**
-     * Resolves nicknames within the name by replacing each token with its canonical form
-     * if found in the dictionary. Hyphens and apostrophes are preserved.
+     * Returns the canonical form of a name if it exists in the nickname dictionary.
+     * This method is intended for use by the comparator phase (NameSimilarityStrategy)
+     * to produce a similarity score with an explanation.
+     *
+     * @param name the name to look up (case-insensitive)
+     * @return the canonical form if found, or null if not in the dictionary
      */
-    private String resolveNicknames(String normalizedName) {
-        // Split on spaces to process each name part independently
-        String[] tokens = normalizedName.split(" ");
-        StringBuilder resolved = new StringBuilder();
-
-        for (int i = 0; i < tokens.length; i++) {
-            if (i > 0) {
-                resolved.append(" ");
-            }
-            String token = tokens[i];
-            // Look up the token in the nickname dictionary
-            String canonical = nicknameDictionary.get(token);
-            resolved.append(canonical != null ? canonical : token);
+    public String getCanonicalName(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
         }
-
-        return resolved.toString();
+        return nicknameDictionary.get(name.toLowerCase().trim());
     }
 
     /**
@@ -137,18 +135,5 @@ public class NameNormalizationStrategy {
         }
 
         return dictionary;
-    }
-
-    /**
-     * Returns the canonical form of a name if it exists in the nickname dictionary.
-     *
-     * @param name the name to look up (case-insensitive)
-     * @return the canonical form if found, or null if not in the dictionary
-     */
-    public String getCanonicalName(String name) {
-        if (name == null || name.isBlank()) {
-            return null;
-        }
-        return nicknameDictionary.get(name.toLowerCase().trim());
     }
 }
