@@ -6,7 +6,7 @@ The Identity Reconciler is a record linkage service that identifies matching per
 
 The POC is a single-process, in-memory Java Spring Boot service deployed on AWS ECS free tier, handling datasets up to 10,000 records per source. Internal components have clean interfaces and module boundaries, making each component extractable as an independent service.
 
-> For scale architecture (200GB+ / streaming), see [design-extension.md](./design-extension.md).
+> For scale architecture (200GB+ / streaming), see [HLD.md](./HLD.md).
 
 ### Design Approach
 
