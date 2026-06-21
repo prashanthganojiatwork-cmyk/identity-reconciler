@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -118,15 +119,17 @@ public class ReconcilerWebController {
 
     /**
      * Renders the results page for a given job ID.
+     * If the jobId is not found in the store, redirects to input with an error message.
      */
     @GetMapping("/results/{jobId}")
-    public String showResults(@PathVariable String jobId, Model model) {
+    public String showResults(@PathVariable String jobId, Model model, RedirectAttributes redirectAttributes) {
         ReconciliationResponse response = resultStore.get(jobId);
         if (response == null) {
-            model.addAttribute("error", "No results found for job ID: " + jobId);
-            return "input";
+            redirectAttributes.addFlashAttribute("error", "No results found for job ID: " + jobId + ". The results may have expired.");
+            return "redirect:/ui/input";
         }
         model.addAttribute("response", response);
+        model.addAttribute("jobId", jobId);
         return "results";
     }
 }
