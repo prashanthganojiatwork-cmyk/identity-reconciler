@@ -1,3 +1,5 @@
+![Build & Deploy](https://github.com/prashanthganojiatwork-cmyk/identity-reconciler/actions/workflows/deploy.yml/badge.svg)
+
 # Identity Reconciler - POC
 
 ## Overview
