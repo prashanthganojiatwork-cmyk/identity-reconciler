@@ -31,6 +31,7 @@ dependencies {
     testImplementation("net.jqwik:jqwik:1.8.0")
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("org.apache.commons:commons-text:1.11.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }
 
