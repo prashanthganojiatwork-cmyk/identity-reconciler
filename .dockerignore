@@ -1,0 +1,9 @@
+.gradle/
+build/
+.git/
+.idea/
+*.iml
+.kiro/
+.vscode/
+.Details.swp
+.jqwik-database

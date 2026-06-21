@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+spring:
+  thymeleaf:
+    cache: true
+    mode: HTML
+    encoding: UTF-8
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    com.prashanthganojiatwork: INFO
