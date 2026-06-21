@@ -399,6 +399,11 @@ tbody tr:hover {
     background: rgba(39, 174, 96, 0.05);
 }
 
+.field-highlight-partial {
+    border: 1px solid var(--color-review);
+    background: rgba(241, 196, 15, 0.08);
+}
+
 .field-highlight-conflict {
     border: 1px solid var(--color-conflict);
     background: rgba(231, 76, 60, 0.05);
@@ -535,4 +540,20 @@ footer {
 .tag-conflict {
     background-color: rgba(231, 76, 60, 0.15);
     color: var(--color-conflict);
+}
+
+/* Tooltip Icon */
+.tooltip-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    cursor: help;
+    position: relative;
+    vertical-align: middle;
+    margin-left: 0.25rem;
 }
