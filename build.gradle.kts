@@ -32,6 +32,7 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5:1.2.0")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.apache.commons:commons-text:1.11.0")
+    implementation("commons-codec:commons-codec:1.16.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }
 
