@@ -12,6 +12,7 @@
             <h2 class="card-title">Reconcile Person Records</h2>
             <p style="color: var(--color-text-light); margin-bottom: 1rem; font-size: 0.875rem;">
                 Paste JSON arrays of person records from two sources to identify matches between them.
+                Or try our <a th:href="@{/ui/datasets}" style="color: var(--color-accent);">sample datasets</a> to see the engine in action.
             </p>
 
             <!-- Error message display -->
@@ -21,7 +22,7 @@
                 <!-- Source A Textarea -->
                 <div class="form-group">
                     <label for="sourceAJson">Source A Records (JSON)</label>
-                    <textarea id="sourceAJson" name="sourceAJson" rows="8"
+                    <textarea id="sourceAJson" name="sourceAJson" rows="10"
                               th:text="${sourceAJson}"
                               placeholder='[{"id":"1","firstname":"John","lastname":"Smith","phone":"2065551234","email":"john@example.com","dateOfBirth":"1990-05-15","address":{"streetLine1":"100 Main St","city":"Seattle","stateCode":"WA","postalCode":"98101"}}]'></textarea>
                 </div>
@@ -29,7 +30,7 @@
                 <!-- Source B Textarea -->
                 <div class="form-group">
                     <label for="sourceBJson">Source B Records (JSON)</label>
-                    <textarea id="sourceBJson" name="sourceBJson" rows="8"
+                    <textarea id="sourceBJson" name="sourceBJson" rows="10"
                               th:text="${sourceBJson}"
                               placeholder='[{"id":"A1","firstname":"Jon","lastname":"Smith","phone":"(206) 555-1234","email":"john+work@example.com","dateOfBirth":"05/15/1990","address":{"streetLine1":"100 Main Street","city":"Seattle","stateCode":"WA","postalCode":"98101"}}]'></textarea>
                 </div>
@@ -59,5 +60,19 @@
     </main>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+    // Load sample data from datasets page if available
+    document.addEventListener('DOMContentLoaded', function() {
+        const sourceA = sessionStorage.getItem('sampleSourceA');
+        const sourceB = sessionStorage.getItem('sampleSourceB');
+        if (sourceA && sourceB) {
+            document.getElementById('sourceAJson').value = sourceA;
+            document.getElementById('sourceBJson').value = sourceB;
+            sessionStorage.removeItem('sampleSourceA');
+            sessionStorage.removeItem('sampleSourceB');
+        }
+    });
+    </script>
 </body>
 </html>

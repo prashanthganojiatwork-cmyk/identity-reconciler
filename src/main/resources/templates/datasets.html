@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Identity Reconciler - Sample Datasets')}">
+    <title>Identity Reconciler - Sample Datasets</title>
+</head>
+<body>
+    <header th:replace="~{fragments/layout :: header}"></header>
+    <nav th:replace="~{fragments/layout :: nav}"></nav>
+
+    <main>
+        <div class="card">
+            <h2 class="card-title">Sample Datasets</h2>
+            <p style="color: var(--color-text-light); margin-bottom: 1.5rem; font-size: 0.875rem;">
+                Pre-built datasets showcasing every matching scenario. Click any card to load it into the
+                reconciliation form and see how the engine handles it. Each dataset has 20+ records per source.
+            </p>
+            <div class="sample-datasets">
+                <div class="sample-dataset-card" onclick="loadSample(1)">
+                    <h3>1. Typos, Formatting &amp; Nicknames</h3>
+                    <p>Name misspellings, phone format differences, date format variations, and nickname resolution (Bill/William, Bob/Robert).</p>
+                    <span class="sample-tag tag-match">High Match Rate</span>
+                    <span class="sample-tag tag-review" style="margin-left:0.3rem;">Nickname Tests</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(2)">
+                    <h3>2. Asymmetric Sources</h3>
+                    <p>Different population sizes (20 in A, 25 in B) with only partial overlap. Tests sparse matching in real-world data.</p>
+                    <span class="sample-tag tag-ambiguous">Sparse Overlap</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(3)">
+                    <h3>3. One-to-Many &amp; Many-to-Many</h3>
+                    <p>Single person matching multiple records (duplicates, family sharing phone). Tests multi-match ranking.</p>
+                    <span class="sample-tag tag-review">Multi-Match</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(4)">
+                    <h3>4. Life Changes</h3>
+                    <p>Name change after marriage, address moves, new phone/email — same person across time.</p>
+                    <span class="sample-tag tag-ambiguous">Name Changes</span>
+                    <span class="sample-tag tag-review" style="margin-left:0.3rem;">Moves</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(5)">
+                    <h3>5. Conflict &amp; Ambiguity</h3>
+                    <p>Same phone different DOB, same name different everything — triggers conflict cap and review band.</p>
+                    <span class="sample-tag tag-conflict">Conflict Cap</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(6)">
+                    <h3>6. Partial &amp; Missing Data</h3>
+                    <p>Records with many null fields. Tests weight redistribution and missing field tolerance.</p>
+                    <span class="sample-tag tag-ambiguous">Sparse Fields</span>
+                </div>
+                <div class="sample-dataset-card" onclick="loadSample(7)">
+                    <h3>7. Kitchen Sink (All Scenarios)</h3>
+                    <p>Combines everything: typos, nicknames, partial data, conflicts, name changes, one-to-many, and non-overlapping records.</p>
+                    <span class="sample-tag tag-match">Comprehensive</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+    const sampleDatasets = {};
+
+    // Dataset 1: Typos, Formatting & Nicknames (20 records each, 1:1 mapping)
+    // Covers: Req 2.1 (name normalization, nicknames), 2.2 (phone formats), 2.3 (email plus-addressing),
+    //         2.4 (USPS abbreviations), 2.5 (DOB format parsing), 2.7 (hyphens/apostrophes in names)
+    sampleDatasets[1] = {
+      sourceA: [
+        {"id":"1","firstname":"William","lastname":"Davis","phone":"5035551001","email":"will.davis@email.com","dateOfBirth":"1987-08-14","address":{"streetLine1":"321 Pine St","city":"Portland","stateCode":"OR","postalCode":"97201"}},
+        {"id":"2","firstname":"Robert","lastname":"Wilson","phone":"2125551002","email":"bob.wilson@work.com","dateOfBirth":"1979-03-28","address":{"streetLine1":"55 Wall Street","city":"New York","stateCode":"NY","postalCode":"10005"}},
+        {"id":"3","firstname":"Elizabeth","lastname":"O'Brien","phone":"6025551003","email":"liz.obrien@gmail.com","dateOfBirth":"1994-11-05","address":{"streetLine1":"4400 Camelback Rd","city":"Phoenix","stateCode":"AZ","postalCode":"85018"}},
+        {"id":"4","firstname":"Richard","lastname":"Clark","phone":"7025551004","email":"rick.clark@yahoo.com","dateOfBirth":"1983-06-19","address":{"streetLine1":"3570 Las Vegas Blvd","city":"Las Vegas","stateCode":"NV","postalCode":"89109"}},
+        {"id":"5","firstname":"Catherine","lastname":"Smith-Jones","phone":"9045551005","email":"cathy.sj@outlook.com","dateOfBirth":"1990-02-08","address":{"streetLine1":"100 Ocean Blvd","city":"Jacksonville","stateCode":"FL","postalCode":"32202"}},
+        {"id":"6","firstname":"James","lastname":"Young","phone":"6155551006","email":"jim.young+personal@music.com","dateOfBirth":"1976-09-30","address":{"streetLine1":"1 Music Row","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"7","firstname":"Margaret","lastname":"White","phone":"6195551007","email":"peggy.white@aol.com","dateOfBirth":"1968-12-22","address":{"streetLine1":"200 Harbor Dr","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"8","firstname":"Thomas","lastname":"Harris Jr.","phone":"4145551008","email":"tom.harris@company.org","dateOfBirth":"1985-04-11","address":{"streetLine1":"750 N Water St","city":"Milwaukee","stateCode":"WI","postalCode":"53202"}},
+        {"id":"9","firstname":"Jennifer","lastname":"Robinson","phone":"6145551009","email":"jenny.robinson@edu.org","dateOfBirth":"1992-07-16","address":{"streetLine1":"33 N High St","city":"Columbus","stateCode":"OH","postalCode":"43215"}},
+        {"id":"10","firstname":"Patricia","lastname":"Thompson","phone":"8015551010","email":"pat.thompson@mail.com","dateOfBirth":"1981-01-03","address":{"streetLine1":"50 E South Temple","city":"Salt Lake City","stateCode":"UT","postalCode":"84101"}},
+        {"id":"11","firstname":"John","lastname":"Smith","phone":"2065551234","email":"john.smith@gmail.com","dateOfBirth":"1990-05-15","address":{"streetLine1":"100 Main St","city":"Seattle","stateCode":"WA","postalCode":"98101"}},
+        {"id":"12","firstname":"Sarah","lastname":"Johnson","phone":"3105559876","email":"sarah.j@yahoo.com","dateOfBirth":"1985-03-22","address":{"streetLine1":"450 Oak Avenue","city":"Los Angeles","stateCode":"CA","postalCode":"90001"}},
+        {"id":"13","firstname":"Michael","lastname":"Williams","phone":"7185554321","email":"mwilliams@outlook.com","dateOfBirth":"1978-11-08","address":{"streetLine1":"789 Broadway","city":"New York","stateCode":"NY","postalCode":"10001"}},
+        {"id":"14","firstname":"Emily","lastname":"Brown","phone":"3125557890","email":"emily.brown+work@hotmail.com","dateOfBirth":"1992-07-30","address":{"streetLine1":"222 Elm Street","city":"Chicago","stateCode":"IL","postalCode":"60601"}},
+        {"id":"15","firstname":"David","lastname":"Garcia","phone":"5125553456","email":"dgarcia@gmail.com","dateOfBirth":"1988-01-12","address":{"streetLine1":"555 Congress Ave","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"16","firstname":"Christopher","lastname":"Anderson","phone":"6175552222","email":"c.anderson@icloud.com","dateOfBirth":"1982-04-17","address":{"streetLine1":"88 Beacon Street","city":"Boston","stateCode":"MA","postalCode":"02101"}},
+        {"id":"17","firstname":"Amanda","lastname":"Taylor","phone":"4045553333","email":"amanda.taylor@gmail.com","dateOfBirth":"1991-12-03","address":{"streetLine1":"300 Peachtree Rd","city":"Atlanta","stateCode":"GA","postalCode":"30301"}},
+        {"id":"18","firstname":"Daniel","lastname":"Thomas","phone":"2025554444","email":"dthomas@proton.me","dateOfBirth":"1975-06-20","address":{"streetLine1":"1600 K Street NW","city":"Washington","stateCode":"DC","postalCode":"20001"}},
+        {"id":"19","firstname":"Jessica","lastname":"Lee","phone":"4155555555","email":"jessica.lee@stanford.edu","dateOfBirth":"1993-02-14","address":{"streetLine1":"450 Serra Mall","city":"Palo Alto","stateCode":"CA","postalCode":"94305"}},
+        {"id":"20","firstname":"Anthony","lastname":"Martinez","phone":"3035556666","email":"tony.m@denver.gov","dateOfBirth":"1980-10-28","address":{"streetLine1":"1437 Bannock St","city":"Denver","stateCode":"CO","postalCode":"80202"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Bill","lastname":"Davis","phone":"(503) 555-1001","email":"will.davis@email.com","dateOfBirth":"08/14/1987","address":{"streetLine1":"321 Pine Street","city":"Portland","stateCode":"OR","postalCode":"97201"}},
+        {"id":"B2","firstname":"Bob","lastname":"Wilson","phone":"212-555-1002","email":"robert.wilson@work.com","dateOfBirth":"03/28/1979","address":{"streetLine1":"55 Wall St","city":"New York","stateCode":"NY","postalCode":"10005"}},
+        {"id":"B3","firstname":"Beth","lastname":"O'Brien","phone":"6025551003","email":"liz.obrien@gmail.com","dateOfBirth":"November 5, 1994","address":{"streetLine1":"4400 Camelback Road","city":"Phoenix","stateCode":"AZ","postalCode":"85018"}},
+        {"id":"B4","firstname":"Dick","lastname":"Clark","phone":"702.555.1004","email":"rick.clark@yahoo.com","dateOfBirth":"6/19/1983","address":{"streetLine1":"3570 Las Vegas Boulevard","city":"Las Vegas","stateCode":"NV","postalCode":"89109"}},
+        {"id":"B5","firstname":"Cathy","lastname":"Smith-Jones","phone":"+1-904-555-1005","email":"cathy.sj@outlook.com","dateOfBirth":"1990-02-08","address":{"streetLine1":"100 Ocean Boulevard","city":"Jacksonville","stateCode":"FL","postalCode":"32202"}},
+        {"id":"B6","firstname":"Jim","lastname":"Young","phone":"6155551006","email":"jim.young@music.com","dateOfBirth":"September 30, 1976","address":{"streetLine1":"1 Music Row","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"B7","firstname":"Peggy","lastname":"White","phone":"(619) 555-1007","email":"peggy.white@aol.com","dateOfBirth":"12/22/1968","address":{"streetLine1":"200 Harbor Drive","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"B8","firstname":"Tom","lastname":"Harris Jr","phone":"4145551008","email":"tom.harris@company.org","dateOfBirth":"04/11/1985","address":{"streetLine1":"750 North Water Street","city":"Milwaukee","stateCode":"WI","postalCode":"53202"}},
+        {"id":"B9","firstname":"Jenny","lastname":"Robinson","phone":"614-555-1009","email":"jenny.robinson@edu.org","dateOfBirth":"1992-07-16","address":{"streetLine1":"33 North High Street","city":"Columbus","stateCode":"OH","postalCode":"43215"}},
+        {"id":"B10","firstname":"Patty","lastname":"Thompson","phone":"8015551010","email":"pat.thompson@mail.com","dateOfBirth":"1/3/1981","address":{"streetLine1":"50 East South Temple","city":"Salt Lake City","stateCode":"UT","postalCode":"84101"}},
+        {"id":"B11","firstname":"Jon","lastname":"Smith","phone":"(206) 555-1234","email":"john.smith@gmail.com","dateOfBirth":"05/15/1990","address":{"streetLine1":"100 Main Street","city":"Seattle","stateCode":"WA","postalCode":"98101"}},
+        {"id":"B12","firstname":"Sara","lastname":"Jonson","phone":"310-555-9876","email":"sarah.j@yahoo.com","dateOfBirth":"March 22, 1985","address":{"streetLine1":"450 Oak Ave","city":"Los Angeles","stateCode":"CA","postalCode":"90001"}},
+        {"id":"B13","firstname":"Micheal","lastname":"Williams","phone":"7185554321","email":"mwilliams@outlook.com","dateOfBirth":"1978-11-08","address":{"streetLine1":"789 Broadway Ave","city":"New York","stateCode":"NY","postalCode":"10001"}},
+        {"id":"B14","firstname":"Emilly","lastname":"Brown","phone":"(312) 555-7890","email":"emily.brown@hotmail.com","dateOfBirth":"7/30/1992","address":{"streetLine1":"222 Elm St","city":"Chicago","stateCode":"IL","postalCode":"60601"}},
+        {"id":"B15","firstname":"David","lastname":"Garsia","phone":"5125553456","email":"dgarcia@gmail.com","dateOfBirth":"1988-01-12","address":{"streetLine1":"555 Congress Avenue","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"B16","firstname":"Chris","lastname":"Anderson","phone":"617-555-2222","email":"c.anderson@icloud.com","dateOfBirth":"4/17/1982","address":{"streetLine1":"88 Beacon St","city":"Boston","stateCode":"MA","postalCode":"02101"}},
+        {"id":"B17","firstname":"Amanda","lastname":"Taylr","phone":"(404) 555-3333","email":"amanda.taylor@gmail.com","dateOfBirth":"12/3/1991","address":{"streetLine1":"300 Peachtree Road","city":"Atlanta","stateCode":"GA","postalCode":"30301"}},
+        {"id":"B18","firstname":"Dan","lastname":"Thomas","phone":"2025554444","email":"dthomas@proton.me","dateOfBirth":"1975-06-20","address":{"streetLine1":"1600 K St NW","city":"Washington","stateCode":"DC","postalCode":"20001"}},
+        {"id":"B19","firstname":"Jessika","lastname":"Lee","phone":"(415) 555-5555","email":"jessica.lee@stanford.edu","dateOfBirth":"February 14, 1993","address":{"streetLine1":"450 Serra Mall","city":"Palo Alto","stateCode":"CA","postalCode":"94305"}},
+        {"id":"B20","firstname":"Tony","lastname":"Martinez","phone":"303.555.6666","email":"tony.m@denver.gov","dateOfBirth":"10/28/1980","address":{"streetLine1":"1437 Bannock Street","city":"Denver","stateCode":"CO","postalCode":"80202"}}
+      ]
+    };
+
+    // Dataset 2: Asymmetric Sources (20 in A, 25 in B, only ~8 overlap)
+    // Covers: Req 1.3 (partial records), 3.5 (ordering), 5.2 (threshold filtering)
+    sampleDatasets[2] = {
+      sourceA: [
+        {"id":"1","firstname":"Aaron","lastname":"Mitchell","phone":"5125550601","email":"aaron.m@gmail.com","dateOfBirth":"1989-03-12","address":{"streetLine1":"200 Congress Ave","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"2","firstname":"Brenda","lastname":"Ortiz","phone":"7185550602","email":"b.ortiz@nyc.gov","dateOfBirth":"1977-09-04","address":{"streetLine1":"1 Centre St","city":"New York","stateCode":"NY","postalCode":"10007"}},
+        {"id":"3","firstname":"Calvin","lastname":"Hughes","phone":"4045550603","email":"calvin.h@cnn.com","dateOfBirth":"1984-06-18","address":{"streetLine1":"1 CNN Center","city":"Atlanta","stateCode":"GA","postalCode":"30303"}},
+        {"id":"4","firstname":"Diana","lastname":"Shaw","phone":"3125550604","email":"diana.shaw@uchicago.edu","dateOfBirth":"1992-11-27","address":{"streetLine1":"5801 S Ellis Ave","city":"Chicago","stateCode":"IL","postalCode":"60637"}},
+        {"id":"5","firstname":"Ethan","lastname":"Flores","phone":"6195550605","email":"ethan.f@qualcomm.com","dateOfBirth":"1986-01-09","address":{"streetLine1":"5775 Morehouse Dr","city":"San Diego","stateCode":"CA","postalCode":"92121"}},
+        {"id":"6","firstname":"Fiona","lastname":"Grant","phone":"2065550606","email":"fiona.g@amazon.com","dateOfBirth":"1991-08-15","address":{"streetLine1":"410 Terry Ave N","city":"Seattle","stateCode":"WA","postalCode":"98109"}},
+        {"id":"7","firstname":"George","lastname":"Palmer","phone":"6175550607","email":"gpalmer@mit.edu","dateOfBirth":"1973-04-22","address":{"streetLine1":"77 Massachusetts Ave","city":"Cambridge","stateCode":"MA","postalCode":"02139"}},
+        {"id":"8","firstname":"Hannah","lastname":"Burke","phone":"3035550608","email":"h.burke@colorado.edu","dateOfBirth":"1995-12-30","address":{"streetLine1":"1600 Pleasant St","city":"Boulder","stateCode":"CO","postalCode":"80309"}},
+        {"id":"9","firstname":"Ivan","lastname":"Reeves","phone":"4155550609","email":"ivan.r@salesforce.com","dateOfBirth":"1981-07-03","address":{"streetLine1":"415 Mission St","city":"San Francisco","stateCode":"CA","postalCode":"94105"}},
+        {"id":"10","firstname":"Julia","lastname":"Warren","phone":"2025550610","email":"j.warren@state.gov","dateOfBirth":"1988-10-19","address":{"streetLine1":"2201 C St NW","city":"Washington","stateCode":"DC","postalCode":"20520"}},
+        {"id":"11","firstname":"Kevin","lastname":"Park","phone":"6505550611","email":"kpark@google.com","dateOfBirth":"1986-09-12","address":{"streetLine1":"1600 Amphitheatre Pkwy","city":"Mountain View","stateCode":"CA","postalCode":"94043"}},
+        {"id":"12","firstname":"Lisa","lastname":"Chang","phone":"2125550612","email":"l.chang@jpmorgan.com","dateOfBirth":"1990-05-30","address":{"streetLine1":"383 Madison Ave","city":"New York","stateCode":"NY","postalCode":"10179"}},
+        {"id":"13","firstname":"Nathan","lastname":"Perry","phone":"7135550613","email":"n.perry@shell.com","dateOfBirth":"1979-02-14","address":{"streetLine1":"150 N Dairy Ashford","city":"Houston","stateCode":"TX","postalCode":"77079"}},
+        {"id":"14","firstname":"Olivia","lastname":"Scott","phone":"5035550614","email":"olivia.s@nike.com","dateOfBirth":"1993-07-08","address":{"streetLine1":"1 Bowerman Dr","city":"Beaverton","stateCode":"OR","postalCode":"97005"}},
+        {"id":"15","firstname":"Paul","lastname":"Bennett","phone":"4125550615","email":"pbennett@pitt.edu","dateOfBirth":"1975-11-22","address":{"streetLine1":"4200 Fifth Ave","city":"Pittsburgh","stateCode":"PA","postalCode":"15260"}},
+        {"id":"16","firstname":"Quinn","lastname":"Foster","phone":"6155550616","email":"q.foster@vanderbilt.edu","dateOfBirth":"1994-04-03","address":{"streetLine1":"2201 West End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"17","firstname":"Rachel","lastname":"Kim","phone":"4255550617","email":"rachel.k@msft.com","dateOfBirth":"1989-06-15","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"18","firstname":"Samuel","lastname":"Cruz","phone":"3055550618","email":"s.cruz@fiu.edu","dateOfBirth":"1983-08-27","address":{"streetLine1":"11200 SW 8th St","city":"Miami","stateCode":"FL","postalCode":"33199"}},
+        {"id":"19","firstname":"Tina","lastname":"Patel","phone":"4085550619","email":"tina.p@apple.com","dateOfBirth":"1991-01-16","address":{"streetLine1":"1 Apple Park Way","city":"Cupertino","stateCode":"CA","postalCode":"95014"}},
+        {"id":"20","firstname":"Victor","lastname":"Lane","phone":"6025550620","email":"v.lane@asu.edu","dateOfBirth":"1987-03-09","address":{"streetLine1":"1151 S Forest Ave","city":"Tempe","stateCode":"AZ","postalCode":"85281"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Aaron","lastname":"Mitchell","phone":"5125550601","email":"a.mitchell@dell.com","dateOfBirth":"1989-03-12","address":{"streetLine1":"1 Dell Way","city":"Round Rock","stateCode":"TX","postalCode":"78682"}},
+        {"id":"B2","firstname":"Kelly","lastname":"Simmons","phone":"9715550621","email":"kelly.s@intel.com","dateOfBirth":"1990-05-20","address":{"streetLine1":"2111 NE 25th Ave","city":"Hillsboro","stateCode":"OR","postalCode":"97124"}},
+        {"id":"B3","firstname":"Lance","lastname":"Perry","phone":"8015550622","email":"lperry@adobe.com","dateOfBirth":"1983-02-14","address":{"streetLine1":"345 Park Ave","city":"San Jose","stateCode":"CA","postalCode":"95110"}},
+        {"id":"B4","firstname":"Diana","lastname":"Shaw","phone":"(312) 555-0604","email":"d.shaw@northwestern.edu","dateOfBirth":"11/27/1992","address":{"streetLine1":"633 Clark St","city":"Evanston","stateCode":"IL","postalCode":"60208"}},
+        {"id":"B5","firstname":"Ethan","lastname":"Flores","phone":"619-555-0605","email":"ethan.f@qualcomm.com","dateOfBirth":"01/09/1986","address":{"streetLine1":"5775 Morehouse Drive","city":"San Diego","stateCode":"CA","postalCode":"92121"}},
+        {"id":"B6","firstname":"Nina","lastname":"Crawford","phone":"5035550623","email":"nina.c@nike.com","dateOfBirth":"1994-09-08","address":{"streetLine1":"1 Bowerman Dr","city":"Beaverton","stateCode":"OR","postalCode":"97005"}},
+        {"id":"B7","firstname":"Oscar","lastname":"Dunn","phone":"2145550624","email":"oscar.d@att.com","dateOfBirth":"1976-11-11","address":{"streetLine1":"208 S Akard St","city":"Dallas","stateCode":"TX","postalCode":"75202"}},
+        {"id":"B8","firstname":"Hannah","lastname":"Burke","phone":"3035550608","email":"hannah.burke@colorado.edu","dateOfBirth":"12/30/1995","address":{"streetLine1":"1600 Pleasant Street","city":"Boulder","stateCode":"CO","postalCode":"80309"}},
+        {"id":"B9","firstname":"Quinn","lastname":"Fox","phone":"6505550625","email":"qfox@stanford.edu","dateOfBirth":"1987-06-25","address":{"streetLine1":"450 Serra Mall","city":"Stanford","stateCode":"CA","postalCode":"94305"}},
+        {"id":"B10","firstname":"Rosa","lastname":"Delgado","phone":"3055550626","email":"rosa.d@miami.edu","dateOfBirth":"1993-03-17","address":{"streetLine1":"1320 S Dixie Hwy","city":"Coral Gables","stateCode":"FL","postalCode":"33146"}},
+        {"id":"B11","firstname":"Kevin","lastname":"Park","phone":"(650) 555-0611","email":"kpark@google.com","dateOfBirth":"09/12/1986","address":{"streetLine1":"1600 Amphitheatre Parkway","city":"Mountain View","stateCode":"CA","postalCode":"94043"}},
+        {"id":"B12","firstname":"Tyler","lastname":"Woods","phone":"9045550627","email":"t.woods@jax.com","dateOfBirth":"1985-08-14","address":{"streetLine1":"1 Stadium Pl","city":"Jacksonville","stateCode":"FL","postalCode":"32202"}},
+        {"id":"B13","firstname":"Uma","lastname":"Krishnan","phone":"4085550628","email":"uma.k@cisco.com","dateOfBirth":"1988-12-01","address":{"streetLine1":"170 W Tasman Dr","city":"San Jose","stateCode":"CA","postalCode":"95134"}},
+        {"id":"B14","firstname":"Olivia","lastname":"Scott","phone":"5035550614","email":"olivia.s@nike.com","dateOfBirth":"07/08/1993","address":{"streetLine1":"1 Bowerman Drive","city":"Beaverton","stateCode":"OR","postalCode":"97005"}},
+        {"id":"B15","firstname":"Wendy","lastname":"Zhao","phone":"2065550629","email":"w.zhao@boeing.com","dateOfBirth":"1982-06-17","address":{"streetLine1":"100 N Riverside","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"B16","firstname":"Fiona","lastname":"Grant","phone":"(206) 555-0606","email":"fiona.grant@amazon.com","dateOfBirth":"August 15, 1991","address":{"streetLine1":"410 Terry Avenue North","city":"Seattle","stateCode":"WA","postalCode":"98109"}},
+        {"id":"B17","firstname":"Xavier","lastname":"Holmes","phone":"4155550630","email":"x.holmes@uber.com","dateOfBirth":"1991-09-23","address":{"streetLine1":"1455 Market St","city":"San Francisco","stateCode":"CA","postalCode":"94103"}},
+        {"id":"B18","firstname":"Rachel","lastname":"Kim","phone":"4255550617","email":"rachel.k@msft.com","dateOfBirth":"1989-06-15","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"B19","firstname":"Yolanda","lastname":"Reyes","phone":"2105550631","email":"y.reyes@utsa.edu","dateOfBirth":"1996-01-29","address":{"streetLine1":"1 UTSA Circle","city":"San Antonio","stateCode":"TX","postalCode":"78249"}},
+        {"id":"B20","firstname":"Victor","lastname":"Lane","phone":"602-555-0620","email":"v.lane@asu.edu","dateOfBirth":"3/9/1987","address":{"streetLine1":"1151 South Forest Avenue","city":"Tempe","stateCode":"AZ","postalCode":"85281"}},
+        {"id":"B21","firstname":"Zachary","lastname":"Stone","phone":"7025550632","email":"z.stone@unlv.edu","dateOfBirth":"1984-04-18","address":{"streetLine1":"4505 S Maryland Pkwy","city":"Las Vegas","stateCode":"NV","postalCode":"89154"}},
+        {"id":"B22","firstname":"Brenda","lastname":"Ortiz","phone":"7185550602","email":"brenda.ortiz@nyc.gov","dateOfBirth":"09/04/1977","address":{"streetLine1":"1 Centre Street","city":"New York","stateCode":"NY","postalCode":"10007"}},
+        {"id":"B23","firstname":"Alice","lastname":"Hampton","phone":"6175550633","email":"a.hampton@bos.gov","dateOfBirth":"1992-07-04","address":{"streetLine1":"1 City Hall Sq","city":"Boston","stateCode":"MA","postalCode":"02201"}},
+        {"id":"B24","firstname":"Paul","lastname":"Bennett","phone":"(412) 555-0615","email":"pbennett@pitt.edu","dateOfBirth":"November 22, 1975","address":{"streetLine1":"4200 Fifth Avenue","city":"Pittsburgh","stateCode":"PA","postalCode":"15260"}},
+        {"id":"B25","firstname":"Derek","lastname":"Mann","phone":"3035550634","email":"d.mann@lockheed.com","dateOfBirth":"1978-10-05","address":{"streetLine1":"12257 S Wadsworth Blvd","city":"Littleton","stateCode":"CO","postalCode":"80125"}}
+      ]
+    };
+
+    // Dataset 3: One-to-Many & Many-to-Many (20 in A, 25 in B)
+    // Covers: Req 3.5 (ordering, max 100 per source_A record), 9.1 (same phone diff name),
+    //         9.5 (ambiguous status), family phone sharing, duplicate entries
+    sampleDatasets[3] = {
+      sourceA: [
+        {"id":"1","firstname":"Robert","lastname":"Johnson","phone":"5125550701","email":"rjohnson@gmail.com","dateOfBirth":"1985-04-10","address":{"streetLine1":"500 E 4th St","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"2","firstname":"Maria","lastname":"Garcia","phone":"2135550702","email":"maria.garcia@yahoo.com","dateOfBirth":"1990-08-22","address":{"streetLine1":"100 N Main St","city":"Los Angeles","stateCode":"CA","postalCode":"90012"}},
+        {"id":"3","firstname":"James","lastname":"Wilson","phone":"3125550703","email":"j.wilson@outlook.com","dateOfBirth":"1978-12-05","address":{"streetLine1":"233 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"4","firstname":"Susan","lastname":"Lee","phone":"4085550704","email":"susan.lee@apple.com","dateOfBirth":"1993-06-18","address":{"streetLine1":"1 Infinite Loop","city":"Cupertino","stateCode":"CA","postalCode":"95014"}},
+        {"id":"5","firstname":"David","lastname":"Martinez","phone":"3055550705","email":"d.martinez@fiu.edu","dateOfBirth":"1982-02-28","address":{"streetLine1":"11200 SW 8th St","city":"Miami","stateCode":"FL","postalCode":"33199"}},
+        {"id":"6","firstname":"Patricia","lastname":"Brown","phone":"2065550706","email":"pat.brown@msft.com","dateOfBirth":"1987-09-14","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"7","firstname":"Michael","lastname":"Davis","phone":"4155550707","email":"m.davis@google.com","dateOfBirth":"1975-11-30","address":{"streetLine1":"1600 Amphitheatre Pkwy","city":"Mountain View","stateCode":"CA","postalCode":"94043"}},
+        {"id":"8","firstname":"Linda","lastname":"Anderson","phone":"6175550708","email":"l.anderson@harvard.edu","dateOfBirth":"1991-03-07","address":{"streetLine1":"1 Harvard Yard","city":"Cambridge","stateCode":"MA","postalCode":"02138"}},
+        {"id":"9","firstname":"William","lastname":"Taylor","phone":"7135550709","email":"will.taylor@shell.com","dateOfBirth":"1980-07-25","address":{"streetLine1":"150 N Dairy Ashford","city":"Houston","stateCode":"TX","postalCode":"77079"}},
+        {"id":"10","firstname":"Jennifer","lastname":"Thomas","phone":"2025550710","email":"j.thomas@smithsonian.org","dateOfBirth":"1994-01-11","address":{"streetLine1":"1000 Jefferson Dr SW","city":"Washington","stateCode":"DC","postalCode":"20560"}},
+        {"id":"11","firstname":"Charles","lastname":"Wright","phone":"6145550711","email":"c.wright@osu.edu","dateOfBirth":"1983-05-19","address":{"streetLine1":"281 W Lane Ave","city":"Columbus","stateCode":"OH","postalCode":"43210"}},
+        {"id":"12","firstname":"Barbara","lastname":"Hall","phone":"9045550712","email":"b.hall@mayo.edu","dateOfBirth":"1976-08-03","address":{"streetLine1":"4500 San Pablo Rd","city":"Jacksonville","stateCode":"FL","postalCode":"32224"}},
+        {"id":"13","firstname":"Richard","lastname":"Allen","phone":"5035550713","email":"r.allen@intel.com","dateOfBirth":"1988-12-17","address":{"streetLine1":"2111 NE 25th Ave","city":"Hillsboro","stateCode":"OR","postalCode":"97124"}},
+        {"id":"14","firstname":"Karen","lastname":"Young","phone":"6155550714","email":"k.young@vanderbilt.edu","dateOfBirth":"1992-04-29","address":{"streetLine1":"2201 West End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"15","firstname":"Steven","lastname":"King","phone":"7025550715","email":"s.king@unlv.edu","dateOfBirth":"1979-10-06","address":{"streetLine1":"4505 S Maryland Pkwy","city":"Las Vegas","stateCode":"NV","postalCode":"89154"}},
+        {"id":"16","firstname":"Nancy","lastname":"Lopez","phone":"2105550716","email":"n.lopez@utsa.edu","dateOfBirth":"1995-06-21","address":{"streetLine1":"1 UTSA Circle","city":"San Antonio","stateCode":"TX","postalCode":"78249"}},
+        {"id":"17","firstname":"Mark","lastname":"Hill","phone":"4125550717","email":"m.hill@cmu.edu","dateOfBirth":"1981-09-13","address":{"streetLine1":"5000 Forbes Ave","city":"Pittsburgh","stateCode":"PA","postalCode":"15213"}},
+        {"id":"18","firstname":"Sandra","lastname":"Green","phone":"6025550718","email":"s.green@asu.edu","dateOfBirth":"1990-01-27","address":{"streetLine1":"1151 S Forest Ave","city":"Tempe","stateCode":"AZ","postalCode":"85281"}},
+        {"id":"19","firstname":"Paul","lastname":"Adams","phone":"8015550719","email":"p.adams@byu.edu","dateOfBirth":"1984-03-08","address":{"streetLine1":"Brigham Young University","city":"Provo","stateCode":"UT","postalCode":"84602"}},
+        {"id":"20","firstname":"Donna","lastname":"Nelson","phone":"3035550720","email":"d.nelson@colorado.edu","dateOfBirth":"1977-07-14","address":{"streetLine1":"1600 Pleasant St","city":"Boulder","stateCode":"CO","postalCode":"80309"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Bob","lastname":"Johnson","phone":"5125550701","email":"rjohnson@gmail.com","dateOfBirth":"04/10/1985","address":{"streetLine1":"500 East 4th Street","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"B2","firstname":"Robert","lastname":"Johnson","phone":"5125550701","email":"bob.johnson@work.com","dateOfBirth":"1985-04-10","address":{"streetLine1":"1200 Barton Springs Rd","city":"Austin","stateCode":"TX","postalCode":"78704"}},
+        {"id":"B3","firstname":"R","lastname":"Johnson","phone":"5125550701","email":"r.johnson@company.io","dateOfBirth":"1985-04-10","address":{"streetLine1":"500 E 4th St","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"B4","firstname":"Maria","lastname":"Garcia","phone":"2135550702","email":"m.garcia@gmail.com","dateOfBirth":"1990-08-22","address":{"streetLine1":"100 North Main Street","city":"Los Angeles","stateCode":"CA","postalCode":"90012"}},
+        {"id":"B5","firstname":"Maria","lastname":"Garcia-Lopez","phone":"2135550702","email":"maria.garcia@yahoo.com","dateOfBirth":"1990-08-22","address":{"streetLine1":"250 S Broadway","city":"Los Angeles","stateCode":"CA","postalCode":"90012"}},
+        {"id":"B6","firstname":"Jim","lastname":"Wilson","phone":"3125550703","email":"j.wilson@outlook.com","dateOfBirth":"1978-12-05","address":{"streetLine1":"233 South Wacker Drive","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"B7","firstname":"James","lastname":"Wilson","phone":"3125550703","email":"james.w@different.com","dateOfBirth":"1978-12-05","address":{"streetLine1":"875 N Michigan Ave","city":"Chicago","stateCode":"IL","postalCode":"60611"}},
+        {"id":"B8","firstname":"Susan","lastname":"Lee","phone":"4085550704","email":"susan.lee@apple.com","dateOfBirth":"1993-06-18","address":{"streetLine1":"1 Apple Park Way","city":"Cupertino","stateCode":"CA","postalCode":"95014"}},
+        {"id":"B9","firstname":"David","lastname":"Martinez","phone":"3055550705","email":"david.m@um.edu","dateOfBirth":"1982-02-28","address":{"streetLine1":"11200 SW 8th Street","city":"Miami","stateCode":"FL","postalCode":"33199"}},
+        {"id":"B10","firstname":"Pat","lastname":"Brown","phone":"2065550706","email":"pat.brown@msft.com","dateOfBirth":"1987-09-14","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"B11","firstname":"Mike","lastname":"Davis","phone":"4155550707","email":"m.davis@google.com","dateOfBirth":"11/30/1975","address":{"streetLine1":"1600 Amphitheatre Parkway","city":"Mountain View","stateCode":"CA","postalCode":"94043"}},
+        {"id":"B12","firstname":"Linda","lastname":"Anderson","phone":"6175550708","email":"linda.a@harvard.edu","dateOfBirth":"1991-03-07","address":{"streetLine1":"1 Harvard Yard","city":"Cambridge","stateCode":"MA","postalCode":"02138"}},
+        {"id":"B13","firstname":"Bill","lastname":"Taylor","phone":"7135550709","email":"will.taylor@shell.com","dateOfBirth":"07/25/1980","address":{"streetLine1":"150 North Dairy Ashford","city":"Houston","stateCode":"TX","postalCode":"77079"}},
+        {"id":"B14","firstname":"Jenny","lastname":"Thomas","phone":"2025550710","email":"j.thomas@smithsonian.org","dateOfBirth":"1994-01-11","address":{"streetLine1":"1000 Jefferson Drive SW","city":"Washington","stateCode":"DC","postalCode":"20560"}},
+        {"id":"B15","firstname":"Charles","lastname":"Wright","phone":"6145550711","email":"chuck.wright@osu.edu","dateOfBirth":"1983-05-19","address":{"streetLine1":"281 West Lane Avenue","city":"Columbus","stateCode":"OH","postalCode":"43210"}},
+        {"id":"B16","firstname":"Barbara","lastname":"Hall","phone":"9045550712","email":"b.hall@mayo.edu","dateOfBirth":"1976-08-03","address":{"streetLine1":"4500 San Pablo Road","city":"Jacksonville","stateCode":"FL","postalCode":"32224"}},
+        {"id":"B17","firstname":"Rich","lastname":"Allen","phone":"5035550713","email":"r.allen@intel.com","dateOfBirth":"12/17/1988","address":{"streetLine1":"2111 NE 25th Avenue","city":"Hillsboro","stateCode":"OR","postalCode":"97124"}},
+        {"id":"B18","firstname":"Karen","lastname":"Young","phone":"6155550714","email":"karen.young@vanderbilt.edu","dateOfBirth":"1992-04-29","address":{"streetLine1":"2201 W End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"B19","firstname":"Steve","lastname":"King","phone":"7025550715","email":"s.king@unlv.edu","dateOfBirth":"10/6/1979","address":{"streetLine1":"4505 South Maryland Parkway","city":"Las Vegas","stateCode":"NV","postalCode":"89154"}},
+        {"id":"B20","firstname":"Nancy","lastname":"Lopez","phone":"(210) 555-0716","email":"n.lopez@utsa.edu","dateOfBirth":"1995-06-21","address":{"streetLine1":"1 UTSA Circle","city":"San Antonio","stateCode":"TX","postalCode":"78249"}},
+        {"id":"B21","firstname":"Robert","lastname":"Johnson Sr","phone":"5125550701","email":"rjohnson.sr@family.com","dateOfBirth":"1960-04-10","address":{"streetLine1":"500 E 4th St","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"B22","firstname":"Marie","lastname":"Garcia","phone":"2135550702","email":"marie.g@hotmail.com","dateOfBirth":"1965-01-15","address":{"streetLine1":"100 N Main St","city":"Los Angeles","stateCode":"CA","postalCode":"90012"}},
+        {"id":"B23","firstname":"Mark","lastname":"Hill","phone":"4125550717","email":"m.hill@cmu.edu","dateOfBirth":"09/13/1981","address":{"streetLine1":"5000 Forbes Avenue","city":"Pittsburgh","stateCode":"PA","postalCode":"15213"}},
+        {"id":"B24","firstname":"Sandra","lastname":"Green","phone":"6025550718","email":"sandra.green@asu.edu","dateOfBirth":"1990-01-27","address":{"streetLine1":"1151 South Forest Avenue","city":"Tempe","stateCode":"AZ","postalCode":"85281"}},
+        {"id":"B25","firstname":"Paul","lastname":"Adams","phone":"8015550719","email":"p.adams@byu.edu","dateOfBirth":"03/08/1984","address":{"streetLine1":"Brigham Young University","city":"Provo","stateCode":"UT","postalCode":"84602"}}
+      ]
+    };
+
+    // Dataset 4: Life Changes (20 in A, 20 in B)
+    // Covers: Req 9.3 (name change post-marriage, reduced penalty), address moves,
+    //         new phone/email, same person across time
+    sampleDatasets[4] = {
+      sourceA: [
+        {"id":"1","firstname":"Sarah","lastname":"Miller","phone":"5035550801","email":"sarah.miller@gmail.com","dateOfBirth":"1990-06-15","address":{"streetLine1":"400 SW 6th Ave","city":"Portland","stateCode":"OR","postalCode":"97204"}},
+        {"id":"2","firstname":"Jessica","lastname":"Chen","phone":"4155550802","email":"jess.chen@yahoo.com","dateOfBirth":"1988-03-22","address":{"streetLine1":"300 Post St","city":"San Francisco","stateCode":"CA","postalCode":"94108"}},
+        {"id":"3","firstname":"Amanda","lastname":"Williams","phone":"2065550803","email":"a.williams@outlook.com","dateOfBirth":"1992-11-08","address":{"streetLine1":"1000 4th Ave","city":"Seattle","stateCode":"WA","postalCode":"98104"}},
+        {"id":"4","firstname":"Rachel","lastname":"Johnson","phone":"3125550804","email":"rachel.j@company.com","dateOfBirth":"1985-07-30","address":{"streetLine1":"111 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"5","firstname":"Emily","lastname":"Brown","phone":"6175550805","email":"em.brown@bu.edu","dateOfBirth":"1993-01-12","address":{"streetLine1":"700 Commonwealth Ave","city":"Boston","stateCode":"MA","postalCode":"02215"}},
+        {"id":"6","firstname":"Michelle","lastname":"Davis","phone":"2135550806","email":"m.davis@usc.edu","dateOfBirth":"1987-09-25","address":{"streetLine1":"3551 Trousdale Pkwy","city":"Los Angeles","stateCode":"CA","postalCode":"90089"}},
+        {"id":"7","firstname":"Laura","lastname":"Wilson","phone":"7135550807","email":"laura.w@rice.edu","dateOfBirth":"1991-04-17","address":{"streetLine1":"6100 Main St","city":"Houston","stateCode":"TX","postalCode":"77005"}},
+        {"id":"8","firstname":"Stephanie","lastname":"Moore","phone":"4045550808","email":"steph.moore@emory.edu","dateOfBirth":"1989-12-03","address":{"streetLine1":"201 Dowman Dr","city":"Atlanta","stateCode":"GA","postalCode":"30322"}},
+        {"id":"9","firstname":"Nicole","lastname":"Taylor","phone":"3055550809","email":"nicole.t@miami.edu","dateOfBirth":"1994-08-20","address":{"streetLine1":"1320 S Dixie Hwy","city":"Coral Gables","stateCode":"FL","postalCode":"33146"}},
+        {"id":"10","firstname":"Megan","lastname":"Anderson","phone":"6025550810","email":"megan.a@asu.edu","dateOfBirth":"1986-05-09","address":{"streetLine1":"1151 S Forest Ave","city":"Tempe","stateCode":"AZ","postalCode":"85281"}},
+        {"id":"11","firstname":"Brian","lastname":"Thompson","phone":"5125550811","email":"b.thompson@utexas.edu","dateOfBirth":"1984-02-14","address":{"streetLine1":"2317 Speedway","city":"Austin","stateCode":"TX","postalCode":"78712"}},
+        {"id":"12","firstname":"Kevin","lastname":"Garcia","phone":"3035550812","email":"k.garcia@colorado.edu","dateOfBirth":"1991-10-28","address":{"streetLine1":"1600 Pleasant St","city":"Boulder","stateCode":"CO","postalCode":"80309"}},
+        {"id":"13","firstname":"Jason","lastname":"Martinez","phone":"6155550813","email":"j.martinez@vanderbilt.edu","dateOfBirth":"1983-06-07","address":{"streetLine1":"2201 West End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"14","firstname":"Andrew","lastname":"Robinson","phone":"2025550814","email":"a.robinson@gwu.edu","dateOfBirth":"1988-12-19","address":{"streetLine1":"2121 I St NW","city":"Washington","stateCode":"DC","postalCode":"20052"}},
+        {"id":"15","firstname":"Ryan","lastname":"Clark","phone":"6145550815","email":"r.clark@osu.edu","dateOfBirth":"1990-03-31","address":{"streetLine1":"281 W Lane Ave","city":"Columbus","stateCode":"OH","postalCode":"43210"}},
+        {"id":"16","firstname":"Matthew","lastname":"Lewis","phone":"4125550816","email":"m.lewis@pitt.edu","dateOfBirth":"1979-07-22","address":{"streetLine1":"4200 Fifth Ave","city":"Pittsburgh","stateCode":"PA","postalCode":"15260"}},
+        {"id":"17","firstname":"Daniel","lastname":"Lee","phone":"4085550817","email":"d.lee@stanford.edu","dateOfBirth":"1992-09-05","address":{"streetLine1":"450 Serra Mall","city":"Stanford","stateCode":"CA","postalCode":"94305"}},
+        {"id":"18","firstname":"Christopher","lastname":"Walker","phone":"7025550818","email":"c.walker@unlv.edu","dateOfBirth":"1981-11-16","address":{"streetLine1":"4505 S Maryland Pkwy","city":"Las Vegas","stateCode":"NV","postalCode":"89154"}},
+        {"id":"19","firstname":"Joshua","lastname":"Hall","phone":"9045550819","email":"j.hall@unf.edu","dateOfBirth":"1995-04-02","address":{"streetLine1":"1 UNF Dr","city":"Jacksonville","stateCode":"FL","postalCode":"32224"}},
+        {"id":"20","firstname":"Tyler","lastname":"Young","phone":"8015550820","email":"t.young@byu.edu","dateOfBirth":"1987-01-28","address":{"streetLine1":"Brigham Young University","city":"Provo","stateCode":"UT","postalCode":"84602"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Sarah","lastname":"Thompson","phone":"5035550801","email":"sarah.thompson@gmail.com","dateOfBirth":"1990-06-15","address":{"streetLine1":"900 NW Lovejoy St","city":"Portland","stateCode":"OR","postalCode":"97209"}},
+        {"id":"B2","firstname":"Jessica","lastname":"Chen-Park","phone":"4155550802","email":"jessica.park@newjob.com","dateOfBirth":"1988-03-22","address":{"streetLine1":"500 Sansome St","city":"San Francisco","stateCode":"CA","postalCode":"94111"}},
+        {"id":"B3","firstname":"Amanda","lastname":"Williams-Scott","phone":"4255550803","email":"a.scott@outlook.com","dateOfBirth":"1992-11-08","address":{"streetLine1":"500 108th Ave NE","city":"Bellevue","stateCode":"WA","postalCode":"98004"}},
+        {"id":"B4","firstname":"Rachel","lastname":"Johnson-Park","phone":"3125550804","email":"rachel.park@newcompany.com","dateOfBirth":"1985-07-30","address":{"streetLine1":"111 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"B5","firstname":"Emily","lastname":"Brown-Nguyen","phone":"6175550805","email":"emily.nguyen@company.com","dateOfBirth":"1993-01-12","address":{"streetLine1":"1 Beacon St","city":"Boston","stateCode":"MA","postalCode":"02108"}},
+        {"id":"B6","firstname":"Michelle","lastname":"Davis-Kim","phone":"2135550806","email":"m.kim@newwork.com","dateOfBirth":"1987-09-25","address":{"streetLine1":"10250 Constellation Blvd","city":"Los Angeles","stateCode":"CA","postalCode":"90067"}},
+        {"id":"B7","firstname":"Laura","lastname":"Patel","phone":"7135550807","email":"laura.patel@energy.com","dateOfBirth":"1991-04-17","address":{"streetLine1":"1000 Louisiana St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"B8","firstname":"Stephanie","lastname":"Moore-Jackson","phone":"4045550808","email":"steph.jackson@cdc.gov","dateOfBirth":"1989-12-03","address":{"streetLine1":"1600 Clifton Rd","city":"Atlanta","stateCode":"GA","postalCode":"30329"}},
+        {"id":"B9","firstname":"Nicole","lastname":"Roberts","phone":"3055550809","email":"nicole.roberts@law.com","dateOfBirth":"1994-08-20","address":{"streetLine1":"1 SE 3rd Ave","city":"Miami","stateCode":"FL","postalCode":"33131"}},
+        {"id":"B10","firstname":"Megan","lastname":"Anderson-Wright","phone":"6025550810","email":"megan.wright@intel.com","dateOfBirth":"1986-05-09","address":{"streetLine1":"5000 W Chandler Blvd","city":"Chandler","stateCode":"AZ","postalCode":"85226"}},
+        {"id":"B11","firstname":"Brian","lastname":"Thompson","phone":"7375550811","email":"b.thompson@tesla.com","dateOfBirth":"1984-02-14","address":{"streetLine1":"3500 Deer Creek Rd","city":"Palo Alto","stateCode":"CA","postalCode":"94304"}},
+        {"id":"B12","firstname":"Kevin","lastname":"Garcia","phone":"7205550812","email":"k.garcia@lockheed.com","dateOfBirth":"1991-10-28","address":{"streetLine1":"12257 S Wadsworth Blvd","city":"Littleton","stateCode":"CO","postalCode":"80125"}},
+        {"id":"B13","firstname":"Jason","lastname":"Martinez","phone":"6155550813","email":"jason.m@music.com","dateOfBirth":"1983-06-07","address":{"streetLine1":"30 Music Sq W","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"B14","firstname":"Andrew","lastname":"Robinson","phone":"7035550814","email":"a.robinson@defense.gov","dateOfBirth":"1988-12-19","address":{"streetLine1":"1400 Defense Pentagon","city":"Arlington","stateCode":"VA","postalCode":"20301"}},
+        {"id":"B15","firstname":"Ryan","lastname":"Clark","phone":"6145550815","email":"ryan.clark@nationwide.com","dateOfBirth":"1990-03-31","address":{"streetLine1":"1 Nationwide Plaza","city":"Columbus","stateCode":"OH","postalCode":"43215"}},
+        {"id":"B16","firstname":"Matthew","lastname":"Lewis","phone":"4125550816","email":"matt.lewis@upmc.edu","dateOfBirth":"1979-07-22","address":{"streetLine1":"200 Lothrop St","city":"Pittsburgh","stateCode":"PA","postalCode":"15213"}},
+        {"id":"B17","firstname":"Daniel","lastname":"Lee","phone":"6505550817","email":"dan.lee@meta.com","dateOfBirth":"1992-09-05","address":{"streetLine1":"1 Hacker Way","city":"Menlo Park","stateCode":"CA","postalCode":"94025"}},
+        {"id":"B18","firstname":"Christopher","lastname":"Walker","phone":"7025550818","email":"chris.walker@mgm.com","dateOfBirth":"1981-11-16","address":{"streetLine1":"3600 Las Vegas Blvd S","city":"Las Vegas","stateCode":"NV","postalCode":"89109"}},
+        {"id":"B19","firstname":"Joshua","lastname":"Hall","phone":"9045550819","email":"josh.hall@usn.mil","dateOfBirth":"1995-04-02","address":{"streetLine1":"NAS Jacksonville","city":"Jacksonville","stateCode":"FL","postalCode":"32212"}},
+        {"id":"B20","firstname":"Tyler","lastname":"Young","phone":"8015550820","email":"tyler.young@lds.org","dateOfBirth":"1987-01-28","address":{"streetLine1":"50 E North Temple","city":"Salt Lake City","stateCode":"UT","postalCode":"84150"}}
+      ]
+    };
+
+    // Dataset 5: Conflict & Ambiguity (20 in A, 20 in B)
+    // Covers: Req 3.4 (conflict cap), 9.1 (same phone diff name/DOB), 9.2 (DOB conflict penalty),
+    //         5.3 (review band), 4.4 (ambiguous explanation)
+    sampleDatasets[5] = {
+      sourceA: [
+        {"id":"1","firstname":"Carlos","lastname":"Hernandez","phone":"7135550001","email":"carlos.h@gmail.com","dateOfBirth":"1990-03-15","address":{"streetLine1":"100 Travis St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"2","firstname":"Amy","lastname":"Foster","phone":"4085550002","email":"amy.foster@apple.com","dateOfBirth":"1987-11-22","address":{"streetLine1":"1 Apple Park Way","city":"Cupertino","stateCode":"CA","postalCode":"95014"}},
+        {"id":"3","firstname":"Derek","lastname":"Powell","phone":"3015550003","email":"d.powell@nih.gov","dateOfBirth":"1975-06-30","address":{"streetLine1":"9000 Rockville Pike","city":"Bethesda","stateCode":"MD","postalCode":"20892"}},
+        {"id":"4","firstname":"Monica","lastname":"Rivera","phone":"3055550004","email":"monica.r@fiu.edu","dateOfBirth":"1993-09-08","address":{"streetLine1":"11200 SW 8th St","city":"Miami","stateCode":"FL","postalCode":"33199"}},
+        {"id":"5","firstname":"Brian","lastname":"Cooper","phone":"6125550005","email":"bcooper@target.com","dateOfBirth":"1982-01-17","address":{"streetLine1":"1000 Nicollet Mall","city":"Minneapolis","stateCode":"MN","postalCode":"55403"}},
+        {"id":"6","firstname":"Tiffany","lastname":"Reed","phone":"5045550006","email":"tiffany.reed@tulane.edu","dateOfBirth":"1991-04-25","address":{"streetLine1":"6823 St Charles Ave","city":"New Orleans","stateCode":"LA","postalCode":"70118"}},
+        {"id":"7","firstname":"Gregory","lastname":"Cox","phone":"4125550007","email":"greg.cox@pitt.edu","dateOfBirth":"1978-08-12","address":{"streetLine1":"4200 Fifth Ave","city":"Pittsburgh","stateCode":"PA","postalCode":"15260"}},
+        {"id":"8","firstname":"Vanessa","lastname":"Ward","phone":"6025550008","email":"v.ward@intel.com","dateOfBirth":"1986-12-03","address":{"streetLine1":"2200 Mission College Blvd","city":"Santa Clara","stateCode":"CA","postalCode":"95054"}},
+        {"id":"9","firstname":"Nathan","lastname":"Bell","phone":"8015550009","email":"n.bell@byu.edu","dateOfBirth":"1995-02-14","address":{"streetLine1":"Brigham Young University","city":"Provo","stateCode":"UT","postalCode":"84602"}},
+        {"id":"10","firstname":"Christina","lastname":"Murphy","phone":"2065550010","email":"c.murphy@msft.com","dateOfBirth":"1984-07-20","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"11","firstname":"Jason","lastname":"Webb","phone":"6175550011","email":"j.webb@mit.edu","dateOfBirth":"1980-05-18","address":{"streetLine1":"77 Massachusetts Ave","city":"Cambridge","stateCode":"MA","postalCode":"02139"}},
+        {"id":"12","firstname":"Kimberly","lastname":"Stone","phone":"3125550012","email":"k.stone@uchicago.edu","dateOfBirth":"1993-10-03","address":{"streetLine1":"5801 S Ellis Ave","city":"Chicago","stateCode":"IL","postalCode":"60637"}},
+        {"id":"13","firstname":"Travis","lastname":"Hunt","phone":"2145550013","email":"t.hunt@att.com","dateOfBirth":"1977-01-29","address":{"streetLine1":"208 S Akard St","city":"Dallas","stateCode":"TX","postalCode":"75202"}},
+        {"id":"14","firstname":"Melissa","lastname":"Ford","phone":"5035550014","email":"m.ford@nike.com","dateOfBirth":"1989-08-06","address":{"streetLine1":"1 Bowerman Dr","city":"Beaverton","stateCode":"OR","postalCode":"97005"}},
+        {"id":"15","firstname":"Brandon","lastname":"Hayes","phone":"4045550015","email":"b.hayes@cdc.gov","dateOfBirth":"1985-11-21","address":{"streetLine1":"1600 Clifton Rd","city":"Atlanta","stateCode":"GA","postalCode":"30329"}},
+        {"id":"16","firstname":"Heather","lastname":"Price","phone":"9045550016","email":"h.price@mayo.edu","dateOfBirth":"1992-04-14","address":{"streetLine1":"4500 San Pablo Rd","city":"Jacksonville","stateCode":"FL","postalCode":"32224"}},
+        {"id":"17","firstname":"Justin","lastname":"Ross","phone":"7025550017","email":"j.ross@unlv.edu","dateOfBirth":"1983-09-27","address":{"streetLine1":"4505 S Maryland Pkwy","city":"Las Vegas","stateCode":"NV","postalCode":"89154"}},
+        {"id":"18","firstname":"Angela","lastname":"Cole","phone":"6155550018","email":"a.cole@vanderbilt.edu","dateOfBirth":"1990-06-09","address":{"streetLine1":"2201 West End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"19","firstname":"Sean","lastname":"Bryant","phone":"2025550019","email":"s.bryant@state.gov","dateOfBirth":"1976-12-11","address":{"streetLine1":"2201 C St NW","city":"Washington","stateCode":"DC","postalCode":"20520"}},
+        {"id":"20","firstname":"Amber","lastname":"Russell","phone":"5125550020","email":"a.russell@utexas.edu","dateOfBirth":"1994-03-05","address":{"streetLine1":"110 Inner Campus Dr","city":"Austin","stateCode":"TX","postalCode":"78705"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Carlos","lastname":"Hernandez","phone":"7135550001","email":"different.carlos@yahoo.com","dateOfBirth":"1985-08-20","address":{"streetLine1":"200 Smith St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"B2","firstname":"Amy","lastname":"Foster","phone":"4085550002","email":"a.foster@google.com","dateOfBirth":"1992-04-10","address":{"streetLine1":"1600 Amphitheatre Pkwy","city":"Mountain View","stateCode":"CA","postalCode":"94043"}},
+        {"id":"B3","firstname":"Derek","lastname":"Powell","phone":"3015550003","email":"derek.p@gmail.com","dateOfBirth":"1975-06-30","address":{"streetLine1":"9000 Rockville Pike","city":"Bethesda","stateCode":"MD","postalCode":"20892"}},
+        {"id":"B4","firstname":"Monica","lastname":"Rivera","phone":"3055550004","email":"m.rivera@different.com","dateOfBirth":"1988-03-15","address":{"streetLine1":"500 Brickell Ave","city":"Miami","stateCode":"FL","postalCode":"33131"}},
+        {"id":"B5","firstname":"Brian","lastname":"Cooper","phone":"6125550005","email":"brian.cooper@bestbuy.com","dateOfBirth":"1982-01-17","address":{"streetLine1":"7601 Penn Ave S","city":"Richfield","stateCode":"MN","postalCode":"55423"}},
+        {"id":"B6","firstname":"Tiffany","lastname":"Reed","phone":"5045550006","email":"t.reed@loyola.edu","dateOfBirth":"1991-04-25","address":{"streetLine1":"6363 St Charles Avenue","city":"New Orleans","stateCode":"LA","postalCode":"70118"}},
+        {"id":"B7","firstname":"Greg","lastname":"Cox","phone":"4125550007","email":"gregory.cox@cmu.edu","dateOfBirth":"1983-02-28","address":{"streetLine1":"5000 Forbes Ave","city":"Pittsburgh","stateCode":"PA","postalCode":"15213"}},
+        {"id":"B8","firstname":"Vanessa","lastname":"Ward","phone":"6025550008","email":"vanessa.w@amd.com","dateOfBirth":"1986-12-03","address":{"streetLine1":"2485 Augustine Dr","city":"Santa Clara","stateCode":"CA","postalCode":"95054"}},
+        {"id":"B9","firstname":"Nathan","lastname":"Bell","phone":"8015550009","email":"nate.bell@utah.edu","dateOfBirth":"1990-11-30","address":{"streetLine1":"201 Presidents Cir","city":"Salt Lake City","stateCode":"UT","postalCode":"84112"}},
+        {"id":"B10","firstname":"Christina","lastname":"Murphy","phone":"2065550010","email":"c.murphy@msft.com","dateOfBirth":"1984-07-20","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"B11","firstname":"Jason","lastname":"Webb","phone":"6175550011","email":"different.jason@yahoo.com","dateOfBirth":"1980-05-18","address":{"streetLine1":"50 Milk St","city":"Boston","stateCode":"MA","postalCode":"02109"}},
+        {"id":"B12","firstname":"Kim","lastname":"Stone","phone":"3125550012","email":"different.kim@hotmail.com","dateOfBirth":"1987-06-15","address":{"streetLine1":"30 N Michigan Ave","city":"Chicago","stateCode":"IL","postalCode":"60602"}},
+        {"id":"B13","firstname":"Travis","lastname":"Hunt","phone":"2145550013","email":"t.hunt@att.com","dateOfBirth":"1977-01-29","address":{"streetLine1":"208 South Akard Street","city":"Dallas","stateCode":"TX","postalCode":"75202"}},
+        {"id":"B14","firstname":"Melissa","lastname":"Ford","phone":"5035550014","email":"melissa.f@adidas.com","dateOfBirth":"1989-08-06","address":{"streetLine1":"5055 N Greeley Ave","city":"Portland","stateCode":"OR","postalCode":"97217"}},
+        {"id":"B15","firstname":"Brandon","lastname":"Hayes","phone":"4045550015","email":"b.hayes@emory.edu","dateOfBirth":"1985-11-21","address":{"streetLine1":"201 Dowman Dr","city":"Atlanta","stateCode":"GA","postalCode":"30322"}},
+        {"id":"B16","firstname":"Heather","lastname":"Price","phone":"9045550016","email":"heather.p@bcbs.com","dateOfBirth":"1992-04-14","address":{"streetLine1":"800 Riverside Ave","city":"Jacksonville","stateCode":"FL","postalCode":"32204"}},
+        {"id":"B17","firstname":"Justin","lastname":"Ross","phone":"7025550017","email":"j.ross@caesars.com","dateOfBirth":"1983-09-27","address":{"streetLine1":"3570 Las Vegas Blvd S","city":"Las Vegas","stateCode":"NV","postalCode":"89109"}},
+        {"id":"B18","firstname":"Angela","lastname":"Cole","phone":"6155550018","email":"ang.cole@music.com","dateOfBirth":"1990-06-09","address":{"streetLine1":"1 Music Sq W","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"B19","firstname":"Sean","lastname":"Bryant","phone":"2025550019","email":"sean.b@different.org","dateOfBirth":"1970-03-22","address":{"streetLine1":"700 Pennsylvania Ave NW","city":"Washington","stateCode":"DC","postalCode":"20408"}},
+        {"id":"B20","firstname":"Amber","lastname":"Russell","phone":"5125550020","email":"amber.r@samsung.com","dateOfBirth":"1994-03-05","address":{"streetLine1":"12100 Samsung Blvd","city":"Austin","stateCode":"TX","postalCode":"78754"}}
+      ]
+    };
+
+    // Dataset 6: Partial & Missing Data (20 in A, 20 in B)
+    // Covers: Req 1.3 (missing fields processed), 3.6 (weight redistribution),
+    //         4.6 (absent field indication), 9.4 (all-empty exclusion)
+    sampleDatasets[6] = {
+      sourceA: [
+        {"id":"1","firstname":"Alex","lastname":"Chen","phone":"4155550101","email":null,"dateOfBirth":"1991-04-20","address":null},
+        {"id":"2","firstname":null,"lastname":null,"phone":"8585550202","email":"maria.lopez@gmail.com","dateOfBirth":null,"address":null},
+        {"id":"3","firstname":"Kevin","lastname":"Park","phone":null,"email":null,"dateOfBirth":"1986-09-12","address":{"streetLine1":"900 Market St","city":"San Francisco","stateCode":"CA","postalCode":"94102"}},
+        {"id":"4","firstname":"Linda","lastname":"Nguyen","phone":"2135550404","email":"l.nguyen@company.com","dateOfBirth":"1993-01-30","address":null},
+        {"id":"5","firstname":"Marcus","lastname":"Jones","phone":null,"email":"marcus.j@outlook.com","dateOfBirth":null,"address":{"streetLine1":"456 MLK Blvd","city":"Atlanta","stateCode":"GA","postalCode":"30303"}},
+        {"id":"6","firstname":"Rachel","lastname":"Kim","phone":"4255550606","email":null,"dateOfBirth":"1989-06-15","address":null},
+        {"id":"7","firstname":null,"lastname":"Patel","phone":"7135550707","email":"a.patel@tech.io","dateOfBirth":"1984-11-28","address":null},
+        {"id":"8","firstname":"Samantha","lastname":null,"phone":null,"email":"sam.w@email.com","dateOfBirth":"1996-03-07","address":{"streetLine1":"123 University Ave","city":"Madison","stateCode":"WI","postalCode":"53703"}},
+        {"id":"9","firstname":"Tyler","lastname":"Brooks","phone":"9045550909","email":null,"dateOfBirth":null,"address":{"streetLine1":"750 Beach Rd","city":"Jacksonville","stateCode":"FL","postalCode":"32250"}},
+        {"id":"10","firstname":"Olivia","lastname":"Scott","phone":null,"email":"olivia.scott@gmail.com","dateOfBirth":"1990-08-22","address":null},
+        {"id":"11","firstname":"Derek","lastname":null,"phone":"3015551111","email":null,"dateOfBirth":"1975-06-30","address":null},
+        {"id":"12","firstname":null,"lastname":"Wilson","phone":null,"email":"j.wilson@outlook.com","dateOfBirth":"1978-12-05","address":{"streetLine1":"233 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"13","firstname":"Hannah","lastname":"Burke","phone":"3035551313","email":"h.burke@colorado.edu","dateOfBirth":null,"address":null},
+        {"id":"14","firstname":"Isaac","lastname":"Morales","phone":null,"email":null,"dateOfBirth":"1992-07-19","address":{"streetLine1":"1 E Main St","city":"Mesa","stateCode":"AZ","postalCode":"85201"}},
+        {"id":"15","firstname":"Julia","lastname":"Warren","phone":"2025551515","email":null,"dateOfBirth":null,"address":{"streetLine1":"2201 C St NW","city":"Washington","stateCode":"DC","postalCode":"20520"}},
+        {"id":"16","firstname":null,"lastname":null,"phone":"5125551616","email":"unknown16@temp.com","dateOfBirth":"1988-05-14","address":null},
+        {"id":"17","firstname":"Noah","lastname":"Fleming","phone":null,"email":"noah.f@proton.me","dateOfBirth":null,"address":null},
+        {"id":"18","firstname":"Sophie","lastname":"Grant","phone":"6155551818","email":null,"dateOfBirth":"1994-10-02","address":{"streetLine1":"2201 West End Ave","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"19","firstname":null,"lastname":null,"phone":null,"email":null,"dateOfBirth":null,"address":null},
+        {"id":"20","firstname":"Victor","lastname":"Lane","phone":"6025552020","email":"v.lane@asu.edu","dateOfBirth":"1987-03-09","address":null}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Alex","lastname":"Chen","phone":null,"email":"alex.chen@work.com","dateOfBirth":"1991-04-20","address":{"streetLine1":"100 Spear St","city":"San Francisco","stateCode":"CA","postalCode":"94105"}},
+        {"id":"B2","firstname":"Maria","lastname":"Lopez","phone":"8585550202","email":"maria.lopez@gmail.com","dateOfBirth":"1988-07-14","address":{"streetLine1":"1234 Palm Dr","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"B3","firstname":"Kevin","lastname":"Park","phone":"6505550303","email":"kpark@stanford.edu","dateOfBirth":"1986-09-12","address":{"streetLine1":"900 Market Street","city":"San Francisco","stateCode":"CA","postalCode":"94102"}},
+        {"id":"B4","firstname":"Linda","lastname":"Nguyen","phone":"2135550404","email":null,"dateOfBirth":"1993-01-30","address":{"streetLine1":"500 S Grand Ave","city":"Los Angeles","stateCode":"CA","postalCode":"90071"}},
+        {"id":"B5","firstname":"Marcus","lastname":"Jones","phone":"4045550505","email":"marcus.j@outlook.com","dateOfBirth":"1977-02-19","address":{"streetLine1":"456 MLK Boulevard","city":"Atlanta","stateCode":"GA","postalCode":"30303"}},
+        {"id":"B6","firstname":"Rachel","lastname":"Kim","phone":"4255550606","email":"rachel.kim@uw.edu","dateOfBirth":"1989-06-15","address":{"streetLine1":"4000 15th Ave NE","city":"Seattle","stateCode":"WA","postalCode":"98105"}},
+        {"id":"B7","firstname":"Anish","lastname":"Patel","phone":"7135550707","email":"a.patel@tech.io","dateOfBirth":"1984-11-28","address":{"streetLine1":"2000 Main St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"B8","firstname":"Samantha","lastname":"Wong","phone":"6085550808","email":"sam.w@email.com","dateOfBirth":"1996-03-07","address":{"streetLine1":"123 University Avenue","city":"Madison","stateCode":"WI","postalCode":"53703"}},
+        {"id":"B9","firstname":"Tyler","lastname":"Brooks","phone":"9045550909","email":"tyler.b@jax.com","dateOfBirth":"1994-10-05","address":{"streetLine1":"750 Beach Road","city":"Jacksonville","stateCode":"FL","postalCode":"32250"}},
+        {"id":"B10","firstname":"Olivia","lastname":"Scott","phone":"5125551010","email":"olivia.scott@gmail.com","dateOfBirth":"1990-08-22","address":{"streetLine1":"600 Congress Ave","city":"Austin","stateCode":"TX","postalCode":"78701"}},
+        {"id":"B11","firstname":"Derek","lastname":"Powell","phone":"3015551111","email":"d.powell@nih.gov","dateOfBirth":"1975-06-30","address":{"streetLine1":"9000 Rockville Pike","city":"Bethesda","stateCode":"MD","postalCode":"20892"}},
+        {"id":"B12","firstname":"James","lastname":"Wilson","phone":"3125551212","email":"j.wilson@outlook.com","dateOfBirth":"1978-12-05","address":{"streetLine1":"233 South Wacker Drive","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"B13","firstname":"Hannah","lastname":"Burke","phone":"3035551313","email":"hannah.burke@colorado.edu","dateOfBirth":"1995-12-30","address":{"streetLine1":"1600 Pleasant St","city":"Boulder","stateCode":"CO","postalCode":"80309"}},
+        {"id":"B14","firstname":"Isaac","lastname":"Morales","phone":"4805551414","email":"i.morales@mesa.gov","dateOfBirth":"1992-07-19","address":{"streetLine1":"1 East Main Street","city":"Mesa","stateCode":"AZ","postalCode":"85201"}},
+        {"id":"B15","firstname":"Julia","lastname":"Warren","phone":"2025551515","email":"j.warren@state.gov","dateOfBirth":"1988-10-19","address":{"streetLine1":"2201 C Street NW","city":"Washington","stateCode":"DC","postalCode":"20520"}},
+        {"id":"B16","firstname":"Ethan","lastname":"Flores","phone":"5125551616","email":"unknown16@temp.com","dateOfBirth":"1988-05-14","address":{"streetLine1":"5775 Morehouse Dr","city":"San Diego","stateCode":"CA","postalCode":"92121"}},
+        {"id":"B17","firstname":"Noah","lastname":"Fleming","phone":"6155551717","email":"noah.f@proton.me","dateOfBirth":"1990-02-28","address":{"streetLine1":"1 Music Sq W","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"B18","firstname":"Sophie","lastname":"Grant","phone":"6155551818","email":"sophie.g@vanderbilt.edu","dateOfBirth":"1994-10-02","address":{"streetLine1":"2201 West End Avenue","city":"Nashville","stateCode":"TN","postalCode":"37235"}},
+        {"id":"B19","firstname":null,"lastname":null,"phone":null,"email":null,"dateOfBirth":null,"address":null},
+        {"id":"B20","firstname":"Victor","lastname":"Lane","phone":"6025552020","email":"v.lane@asu.edu","dateOfBirth":"03/09/1987","address":{"streetLine1":"1151 S Forest Ave","city":"Tempe","stateCode":"AZ","postalCode":"85281"}}
+      ]
+    };
+
+    // Dataset 7: Kitchen Sink - combines ALL scenarios (25 in A, 30 in B)
+    // Covers ALL requirements: typos, nicknames, partial data, conflicts, name changes,
+    //         one-to-many, many-to-many, non-overlapping, format differences, USPS abbrevs,
+    //         plus-addressing, DOB formats, hyphens/apostrophes, all-empty exclusion
+    sampleDatasets[7] = {
+      sourceA: [
+        {"id":"1","firstname":"William","lastname":"O'Connor","phone":"5035550901","email":"will.oconnor+home@gmail.com","dateOfBirth":"1987-08-14","address":{"streetLine1":"321 Pine St","city":"Portland","stateCode":"OR","postalCode":"97201"}},
+        {"id":"2","firstname":"Robert","lastname":"Kim-Park","phone":"2125550902","email":"bob.kimpark@work.com","dateOfBirth":"1979-03-28","address":{"streetLine1":"55 Wall Street","city":"New York","stateCode":"NY","postalCode":"10005"}},
+        {"id":"3","firstname":"Elizabeth","lastname":"Santos","phone":"6025550903","email":"liz.santos@gmail.com","dateOfBirth":"1994-11-05","address":{"streetLine1":"4400 Camelback Rd","city":"Phoenix","stateCode":"AZ","postalCode":"85018"}},
+        {"id":"4","firstname":"Catherine","lastname":"Murphy","phone":"9045550904","email":"cathy.murphy@outlook.com","dateOfBirth":"1990-02-08","address":{"streetLine1":"100 Ocean Blvd","city":"Jacksonville","stateCode":"FL","postalCode":"32202"}},
+        {"id":"5","firstname":"James","lastname":"Nguyen","phone":"6155550905","email":"jim.nguyen@music.com","dateOfBirth":"1976-09-30","address":{"streetLine1":"1 Music Row","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"6","firstname":"Margaret","lastname":"Torres","phone":"6195550906","email":"peggy.torres@aol.com","dateOfBirth":"1968-12-22","address":{"streetLine1":"200 Harbor Dr","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"7","firstname":"Sarah","lastname":"Miller","phone":"5035550907","email":"sarah.miller@gmail.com","dateOfBirth":"1990-06-15","address":{"streetLine1":"400 SW 6th Ave","city":"Portland","stateCode":"OR","postalCode":"97204"}},
+        {"id":"8","firstname":"Jessica","lastname":"Chen","phone":"4155550908","email":"jess.chen@yahoo.com","dateOfBirth":"1988-03-22","address":{"streetLine1":"300 Post St","city":"San Francisco","stateCode":"CA","postalCode":"94108"}},
+        {"id":"9","firstname":"Alex","lastname":"Patel","phone":"7135550909","email":null,"dateOfBirth":"1984-11-28","address":null},
+        {"id":"10","firstname":"Samantha","lastname":null,"phone":null,"email":"sam.w@email.com","dateOfBirth":"1996-03-07","address":{"streetLine1":"123 University Ave","city":"Madison","stateCode":"WI","postalCode":"53703"}},
+        {"id":"11","firstname":null,"lastname":null,"phone":"8585551111","email":"mystery@gmail.com","dateOfBirth":null,"address":null},
+        {"id":"12","firstname":"Daniel","lastname":"Thomas","phone":"2025551212","email":"dthomas@proton.me","dateOfBirth":"1975-06-20","address":{"streetLine1":"1600 K Street NW","city":"Washington","stateCode":"DC","postalCode":"20001"}},
+        {"id":"13","firstname":"Carlos","lastname":"Hernandez","phone":"7135551313","email":"carlos.h@gmail.com","dateOfBirth":"1990-03-15","address":{"streetLine1":"100 Travis St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"14","firstname":"Nathan","lastname":"Bell","phone":"8015551414","email":"n.bell@byu.edu","dateOfBirth":"1995-02-14","address":{"streetLine1":"Brigham Young University","city":"Provo","stateCode":"UT","postalCode":"84602"}},
+        {"id":"15","firstname":"Amanda","lastname":"Williams","phone":"2065551515","email":"a.williams@outlook.com","dateOfBirth":"1992-11-08","address":{"streetLine1":"1000 4th Ave","city":"Seattle","stateCode":"WA","postalCode":"98104"}},
+        {"id":"16","firstname":"Kevin","lastname":"Park","phone":null,"email":null,"dateOfBirth":"1986-09-12","address":{"streetLine1":"900 Market St","city":"San Francisco","stateCode":"CA","postalCode":"94102"}},
+        {"id":"17","firstname":"Brandon","lastname":"Hayes","phone":"4045551717","email":"b.hayes@cdc.gov","dateOfBirth":"1985-11-21","address":{"streetLine1":"1600 Clifton Rd","city":"Atlanta","stateCode":"GA","postalCode":"30329"}},
+        {"id":"18","firstname":"Heather","lastname":"Price","phone":"9045551818","email":"h.price@mayo.edu","dateOfBirth":"1992-04-14","address":{"streetLine1":"4500 San Pablo Rd","city":"Jacksonville","stateCode":"FL","postalCode":"32224"}},
+        {"id":"19","firstname":null,"lastname":null,"phone":null,"email":null,"dateOfBirth":null,"address":null},
+        {"id":"20","firstname":"Megan","lastname":"Anderson","phone":"6025552020","email":"megan.a@asu.edu","dateOfBirth":"1986-05-09","address":{"streetLine1":"1151 S Forest Ave","city":"Tempe","stateCode":"AZ","postalCode":"85281"}},
+        {"id":"21","firstname":"Patricia","lastname":"Brown","phone":"2065552121","email":"pat.brown@msft.com","dateOfBirth":"1987-09-14","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"22","firstname":"Rachel","lastname":"Johnson","phone":"3125552222","email":"rachel.j@company.com","dateOfBirth":"1985-07-30","address":{"streetLine1":"111 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"23","firstname":"Emily","lastname":"Brown","phone":"6175552323","email":"em.brown@bu.edu","dateOfBirth":"1993-01-12","address":{"streetLine1":"700 Commonwealth Ave","city":"Boston","stateCode":"MA","postalCode":"02215"}},
+        {"id":"24","firstname":"Tyler","lastname":"Brooks","phone":"9045552424","email":null,"dateOfBirth":null,"address":{"streetLine1":"750 Beach Rd","city":"Jacksonville","stateCode":"FL","postalCode":"32250"}},
+        {"id":"25","firstname":"Anthony","lastname":"Martinez","phone":"3035552525","email":"tony.m@denver.gov","dateOfBirth":"1980-10-28","address":{"streetLine1":"1437 Bannock St","city":"Denver","stateCode":"CO","postalCode":"80202"}}
+      ],
+      sourceB: [
+        {"id":"B1","firstname":"Bill","lastname":"O'Connor","phone":"(503) 555-0901","email":"will.oconnor@gmail.com","dateOfBirth":"08/14/1987","address":{"streetLine1":"321 Pine Street","city":"Portland","stateCode":"OR","postalCode":"97201"}},
+        {"id":"B2","firstname":"Bob","lastname":"Kim-Park","phone":"212-555-0902","email":"robert.kimpark@work.com","dateOfBirth":"03/28/1979","address":{"streetLine1":"55 Wall St","city":"New York","stateCode":"NY","postalCode":"10005"}},
+        {"id":"B3","firstname":"Beth","lastname":"Santos","phone":"6025550903","email":"liz.santos@gmail.com","dateOfBirth":"November 5, 1994","address":{"streetLine1":"4400 Camelback Road","city":"Phoenix","stateCode":"AZ","postalCode":"85018"}},
+        {"id":"B4","firstname":"Cathy","lastname":"Murphy","phone":"+1-904-555-0904","email":"cathy.murphy@outlook.com","dateOfBirth":"1990-02-08","address":{"streetLine1":"100 Ocean Boulevard","city":"Jacksonville","stateCode":"FL","postalCode":"32202"}},
+        {"id":"B5","firstname":"Jim","lastname":"Nguyen","phone":"6155550905","email":"jim.nguyen@music.com","dateOfBirth":"September 30, 1976","address":{"streetLine1":"1 Music Row","city":"Nashville","stateCode":"TN","postalCode":"37203"}},
+        {"id":"B6","firstname":"Peggy","lastname":"Torres","phone":"(619) 555-0906","email":"peggy.torres@aol.com","dateOfBirth":"12/22/1968","address":{"streetLine1":"200 Harbor Drive","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"B7","firstname":"Sarah","lastname":"Thompson","phone":"5035550907","email":"sarah.thompson@gmail.com","dateOfBirth":"1990-06-15","address":{"streetLine1":"900 NW Lovejoy St","city":"Portland","stateCode":"OR","postalCode":"97209"}},
+        {"id":"B8","firstname":"Jessica","lastname":"Chen-Park","phone":"4155550908","email":"jessica.park@newjob.com","dateOfBirth":"1988-03-22","address":{"streetLine1":"500 Sansome St","city":"San Francisco","stateCode":"CA","postalCode":"94111"}},
+        {"id":"B9","firstname":"Anish","lastname":"Patel","phone":"7135550909","email":"a.patel@tech.io","dateOfBirth":"1984-11-28","address":{"streetLine1":"2000 Main St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"B10","firstname":"Samantha","lastname":"Wong","phone":"6085551010","email":"sam.w@email.com","dateOfBirth":"1996-03-07","address":{"streetLine1":"123 University Avenue","city":"Madison","stateCode":"WI","postalCode":"53703"}},
+        {"id":"B11","firstname":"Maria","lastname":"Lopez","phone":"8585551111","email":"mystery@gmail.com","dateOfBirth":"1988-07-14","address":{"streetLine1":"1234 Palm Dr","city":"San Diego","stateCode":"CA","postalCode":"92101"}},
+        {"id":"B12","firstname":"Dan","lastname":"Thomas","phone":"2025551212","email":"dthomas@proton.me","dateOfBirth":"1975-06-20","address":{"streetLine1":"1600 K St NW","city":"Washington","stateCode":"DC","postalCode":"20001"}},
+        {"id":"B13","firstname":"Carlos","lastname":"Hernandez","phone":"7135551313","email":"different.carlos@yahoo.com","dateOfBirth":"1985-08-20","address":{"streetLine1":"200 Smith St","city":"Houston","stateCode":"TX","postalCode":"77002"}},
+        {"id":"B14","firstname":"Nathan","lastname":"Bell","phone":"8015551414","email":"nate.bell@utah.edu","dateOfBirth":"1990-11-30","address":{"streetLine1":"201 Presidents Cir","city":"Salt Lake City","stateCode":"UT","postalCode":"84112"}},
+        {"id":"B15","firstname":"Amanda","lastname":"Williams-Scott","phone":"4255551515","email":"a.scott@outlook.com","dateOfBirth":"1992-11-08","address":{"streetLine1":"500 108th Ave NE","city":"Bellevue","stateCode":"WA","postalCode":"98004"}},
+        {"id":"B16","firstname":"Kevin","lastname":"Park","phone":"6505551616","email":"kpark@stanford.edu","dateOfBirth":"1986-09-12","address":{"streetLine1":"900 Market Street","city":"San Francisco","stateCode":"CA","postalCode":"94102"}},
+        {"id":"B17","firstname":"Brandon","lastname":"Hayes","phone":"4045551717","email":"b.hayes@emory.edu","dateOfBirth":"1985-11-21","address":{"streetLine1":"201 Dowman Dr","city":"Atlanta","stateCode":"GA","postalCode":"30322"}},
+        {"id":"B18","firstname":"Heather","lastname":"Price","phone":"9045551818","email":"heather.p@bcbs.com","dateOfBirth":"1992-04-14","address":{"streetLine1":"800 Riverside Ave","city":"Jacksonville","stateCode":"FL","postalCode":"32204"}},
+        {"id":"B19","firstname":null,"lastname":null,"phone":null,"email":null,"dateOfBirth":null,"address":null},
+        {"id":"B20","firstname":"Megan","lastname":"Anderson-Wright","phone":"6025552020","email":"megan.wright@intel.com","dateOfBirth":"1986-05-09","address":{"streetLine1":"5000 W Chandler Blvd","city":"Chandler","stateCode":"AZ","postalCode":"85226"}},
+        {"id":"B21","firstname":"Pat","lastname":"Brown","phone":"2065552121","email":"pat.brown@msft.com","dateOfBirth":"1987-09-14","address":{"streetLine1":"1 Microsoft Way","city":"Redmond","stateCode":"WA","postalCode":"98052"}},
+        {"id":"B22","firstname":"Rachel","lastname":"Johnson-Park","phone":"3125552222","email":"rachel.park@newcompany.com","dateOfBirth":"1985-07-30","address":{"streetLine1":"111 S Wacker Dr","city":"Chicago","stateCode":"IL","postalCode":"60606"}},
+        {"id":"B23","firstname":"Emily","lastname":"Brown-Nguyen","phone":"6175552323","email":"emily.nguyen@company.com","dateOfBirth":"1993-01-12","address":{"streetLine1":"1 Beacon St","city":"Boston","stateCode":"MA","postalCode":"02108"}},
+        {"id":"B24","firstname":"Tyler","lastname":"Brooks","phone":"9045552424","email":"tyler.b@jax.com","dateOfBirth":"1994-10-05","address":{"streetLine1":"750 Beach Road","city":"Jacksonville","stateCode":"FL","postalCode":"32250"}},
+        {"id":"B25","firstname":"Tony","lastname":"Martinez","phone":"303.555.2525","email":"tony.m@denver.gov","dateOfBirth":"10/28/1980","address":{"streetLine1":"1437 Bannock Street","city":"Denver","stateCode":"CO","postalCode":"80202"}},
+        {"id":"B26","firstname":"Zara","lastname":"Ahmed","phone":"4085552626","email":"z.ahmed@meta.com","dateOfBirth":"1993-05-11","address":{"streetLine1":"1 Hacker Way","city":"Menlo Park","stateCode":"CA","postalCode":"94025"}},
+        {"id":"B27","firstname":"William","lastname":"O'Connor","phone":"5035550901","email":"will.oc@newjob.com","dateOfBirth":"1987-08-14","address":{"streetLine1":"1000 SW Broadway","city":"Portland","stateCode":"OR","postalCode":"97205"}},
+        {"id":"B28","firstname":"Oscar","lastname":"Dunn","phone":"2145552828","email":"oscar.d@att.com","dateOfBirth":"1976-11-11","address":{"streetLine1":"208 S Akard St","city":"Dallas","stateCode":"TX","postalCode":"75202"}},
+        {"id":"B29","firstname":"Quinn","lastname":"Fox","phone":"6505552929","email":"qfox@stanford.edu","dateOfBirth":"1987-06-25","address":{"streetLine1":"450 Serra Mall","city":"Stanford","stateCode":"CA","postalCode":"94305"}},
+        {"id":"B30","firstname":"Donna","lastname":"Nelson","phone":"3035553030","email":"d.nelson@colorado.edu","dateOfBirth":"1977-07-14","address":{"streetLine1":"1600 Pleasant Street","city":"Boulder","stateCode":"CO","postalCode":"80309"}}
+      ]
+    };
+
+    function loadSample(num) {
+        const data = sampleDatasets[num];
+        if (!data) return;
+        // Store in sessionStorage and redirect to input page
+        sessionStorage.setItem('sampleSourceA', JSON.stringify(data.sourceA, null, 2));
+        sessionStorage.setItem('sampleSourceB', JSON.stringify(data.sourceB, null, 2));
+        window.location.href = '/ui/input';
+    }
+    </script>
+</body>
+</html>

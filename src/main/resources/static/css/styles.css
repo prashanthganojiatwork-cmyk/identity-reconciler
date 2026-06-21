@@ -469,3 +469,70 @@ footer {
         align-items: center;
     }
 }
+
+
+/* Sample Datasets Section */
+.sample-datasets {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.sample-dataset-card {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--color-bg);
+}
+
+.sample-dataset-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+    transform: translateY(-2px);
+}
+
+.sample-dataset-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 0.4rem;
+}
+
+.sample-dataset-card p {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    margin-bottom: 0.6rem;
+    line-height: 1.4;
+}
+
+.sample-tag {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tag-match {
+    background-color: rgba(39, 174, 96, 0.15);
+    color: var(--color-match);
+}
+
+.tag-review {
+    background-color: rgba(241, 196, 15, 0.15);
+    color: #b7950b;
+}
+
+.tag-ambiguous {
+    background-color: rgba(230, 126, 34, 0.15);
+    color: var(--color-ambiguous);
+}
+
+.tag-conflict {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: var(--color-conflict);
+}
