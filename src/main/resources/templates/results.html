@@ -1,22 +1,148 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Identity Reconciler - Results')}">
-    <title>Identity Reconciler - Results</title>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reconciliation Results</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .metadata-bar { display: flex; flex-wrap: wrap; gap: 16px; background: #fff; border-radius: 8px; padding: 16px 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metadata-item { display: flex; flex-direction: column; }
+        .metadata-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metadata-value { font-size: 1.25rem; font-weight: 600; color: #333; }
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .filter-btn:hover { background: #e9ecef; }
+        .filter-btn.active { background: #007bff; color: #fff; border-color: #007bff; }
+        .results-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .results-table th { background: #343a40; color: #fff; padding: 12px 16px; text-align: left; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .results-table td { padding: 12px 16px; border-bottom: 1px solid #eee; }
+        .results-table tr:last-child td { border-bottom: none; }
+        .row-match { background-color: #d4edda; }
+        .row-review { background-color: #fff3cd; }
+        .row-ambiguous { background-color: #ffe0b2; }
+        .row-match:hover { background-color: #c3e6cb; }
+        .row-review:hover { background-color: #ffeeba; }
+        .row-ambiguous:hover { background-color: #ffd699; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .badge-match { background: #28a745; color: #fff; }
+        .badge-review { background: #ffc107; color: #333; }
+        .badge-ambiguous { background: #ff9800; color: #fff; }
+        .score { font-weight: 700; font-size: 1rem; }
+        .detail-link { color: #007bff; text-decoration: none; font-weight: 500; }
+        .detail-link:hover { text-decoration: underline; }
+        .back-link { display: inline-block; margin-top: 24px; color: #007bff; text-decoration: none; font-size: 0.95rem; }
+        .back-link:hover { text-decoration: underline; }
+        .empty-state { text-align: center; padding: 48px; background: #fff; border-radius: 8px; color: #666; }
+    </style>
 </head>
 <body>
-    <header th:replace="~{fragments/layout :: header}"></header>
-    <nav th:replace="~{fragments/layout :: nav}"></nav>
+<div class="container">
+    <h1>Reconciliation Results</h1>
 
-    <main>
-        <div class="card">
-            <h2 class="card-title">Reconciliation Results</h2>
-            <p style="color: var(--color-text-light); font-size: 0.875rem;">
-                Results for job: <span th:text="${response.jobId()}"></span>
-            </p>
-            <!-- Full results template will be implemented in task 10.3 -->
+    <!-- Metadata Summary Bar -->
+    <div class="metadata-bar">
+        <div class="metadata-item">
+            <span class="metadata-label">Job ID</span>
+            <span class="metadata-value" th:text="${jobId}">&#8212;</span>
         </div>
-    </main>
+        <div class="metadata-item">
+            <span class="metadata-label">Source A Records</span>
+            <span class="metadata-value" th:text="${response.metadata().sourceACount()}">0</span>
+        </div>
+        <div class="metadata-item">
+            <span class="metadata-label">Source B Records</span>
+            <span class="metadata-value" th:text="${response.metadata().sourceBCount()}">0</span>
+        </div>
+        <div class="metadata-item">
+            <span class="metadata-label">Matches Found</span>
+            <span class="metadata-value" th:text="${response.metadata().matchesFound()}">0</span>
+        </div>
+        <div class="metadata-item">
+            <span class="metadata-label">Flagged for Review</span>
+            <span class="metadata-value" th:text="${response.metadata().flaggedForReview()}">0</span>
+        </div>
+        <div class="metadata-item">
+            <span class="metadata-label">Processing Time</span>
+            <span class="metadata-value" th:text="${response.metadata().processingDurationMs() + ' ms'}">0 ms</span>
+        </div>
+    </div>
 
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <!-- Filter Controls -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterResults('all')">All</button>
+        <button class="filter-btn" onclick="filterResults('match')">Matches Only</button>
+        <button class="filter-btn" onclick="filterResults('review')">Review Only</button>
+        <button class="filter-btn" onclick="filterResults('ambiguous')">Ambiguous Only</button>
+    </div>
+
+    <!-- Results Table -->
+    <div th:if="${response.matches() != null and !response.matches().isEmpty()}">
+        <table class="results-table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Source A ID</th>
+                <th>Source B ID</th>
+                <th>Confidence Score</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="match, iterStat : ${response.matches()}"
+                th:classappend="${match.status() == 'match'} ? 'row-match' : (${match.status() == 'review'} ? 'row-review' : 'row-ambiguous')"
+                th:attr="data-status=${match.status()}">
+                <td th:text="${iterStat.index + 1}">1</td>
+                <td th:text="${match.sourceARecordId()}">A-001</td>
+                <td th:text="${match.sourceBRecordId()}">B-001</td>
+                <td>
+                    <span class="score" th:text="${#numbers.formatDecimal(match.confidenceScore(), 1, 2)}">0.85</span>
+                </td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${match.status() == 'match'} ? 'badge-match' : (${match.status() == 'review'} ? 'badge-review' : 'badge-ambiguous')"
+                          th:text="${match.status()}">match</span>
+                </td>
+                <td>
+                    <a class="detail-link"
+                       th:href="@{/ui/results/{jid}/match/{idx}(jid=${jobId}, idx=${iterStat.index})}">
+                        View Details
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${response.matches() == null or response.matches().isEmpty()}" class="empty-state">
+        <p>No match candidates found above the review band threshold.</p>
+    </div>
+
+    <!-- Back Link -->
+    <a class="back-link" th:href="@{/ui/input}">&larr; New Reconciliation</a>
+</div>
+
+<!-- Filter Script -->
+<script>
+    function filterResults(status) {
+        document.querySelectorAll('.filter-btn').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        var rows = document.querySelectorAll('.results-table tbody tr');
+        rows.forEach(function(row) {
+            if (status === 'all') {
+                row.style.display = '';
+            } else {
+                row.style.display = row.getAttribute('data-status') === status ? '' : 'none';
+            }
+        });
+    }
+</script>
 </body>
 </html>
