@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Match Detail</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 8px; }
+        h2 { color: #444; margin-top: 32px; margin-bottom: 12px; font-size: 1.25rem; }
+
+        /* Summary Card */
+        .summary-card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .summary-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+        .summary-ids { display: flex; gap: 24px; flex-wrap: wrap; }
+        .summary-id { display: flex; flex-direction: column; }
+        .summary-id-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-id-value { font-size: 1.1rem; font-weight: 600; color: #333; }
+
+        /* Score Gauge */
+        .score-gauge { margin: 16px 0; }
+        .score-gauge-label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+        .score-bar-container { background: #e9ecef; border-radius: 8px; height: 28px; position: relative; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; }
+        .score-bar-fill.high { background: linear-gradient(90deg, #28a745, #20c997); }
+        .score-bar-fill.medium { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+        .score-bar-fill.low { background: linear-gradient(90deg, #dc3545, #e83e8c); }
+        .score-bar-text { font-size: 0.85rem; font-weight: 700; color: #fff; }
+
+        /* Badges */
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .badge-match { background: #28a745; color: #fff; }
+        .badge-review { background: #ffc107; color: #333; }
+        .badge-ambiguous { background: #ff9800; color: #fff; }
+
+        /* Explanation */
+        .explanation-text { background: #f8f9fa; border-left: 4px solid #007bff; padding: 12px 16px; margin: 16px 0; border-radius: 0 4px 4px 0; font-size: 0.95rem; color: #333; line-height: 1.5; }
+
+        /* Side-by-Side Records */
+        .records-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .record-card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .record-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1rem; color: #555; }
+        .record-field { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+        .record-field:last-child { border-bottom: none; }
+        .record-field-name { font-weight: 500; color: #666; font-size: 0.9rem; }
+        .record-field-value { font-weight: 600; color: #333; font-size: 0.9rem; }
+
+        /* Breakdown Table */
+        .breakdown-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .breakdown-table th { background: #343a40; color: #fff; padding: 10px 14px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .breakdown-table td { padding: 10px 14px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .breakdown-table tr:last-child td { border-bottom: none; }
+        .breakdown-table tr.field-high { background-color: #d4edda; }
+        .breakdown-table tr.field-low { background-color: #f8d7da; }
+        .breakdown-table tr.field-mid { background-color: #fff; }
+
+        /* Ambiguity Reasons */
+        .ambiguity-section { background: #fff3cd; border-radius: 8px; padding: 16px 20px; margin-top: 24px; border: 1px solid #ffc107; }
+        .ambiguity-section h3 { margin-top: 0; color: #856404; font-size: 1rem; }
+        .ambiguity-reasons { list-style: disc; padding-left: 20px; color: #856404; }
+        .ambiguity-reasons li { margin-bottom: 6px; font-size: 0.9rem; }
+
+        /* Back Link */
+        .back-link { display: inline-block; margin-top: 24px; margin-bottom: 24px; color: #007bff; text-decoration: none; font-size: 0.95rem; }
+        .back-link:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            .records-grid { grid-template-columns: 1fr; }
+            .summary-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Back Link -->
+    <a class="back-link" th:href="@{/ui/results/{jid}(jid=${jobId})}">&larr; Back to Results</a>
+
+    <h1>Match Detail</h1>
+    <p style="color: #666; margin-top: 0;">
+        Match #<span th:text="${matchIndex + 1}">1</span> from Job
+        <span th:text="${jobId}" style="font-family: monospace;">job-id</span>
+    </p>
+
+    <!-- Summary Card -->
+    <div class="summary-card">
+        <div class="summary-header">
+            <div class="summary-ids">
+                <div class="summary-id">
+                    <span class="summary-id-label">Source A Record</span>
+                    <span class="summary-id-value" th:text="${match.sourceARecordId()}">A-001</span>
+                </div>
+                <div class="summary-id">
+                    <span class="summary-id-label">Source B Record</span>
+                    <span class="summary-id-value" th:text="${match.sourceBRecordId()}">B-001</span>
+                </div>
+            </div>
+            <span class="badge"
+                  th:classappend="${match.status() == 'match'} ? 'badge-match' : (${match.status() == 'review'} ? 'badge-review' : 'badge-ambiguous')"
+                  th:text="${match.status()}">match</span>
+        </div>
+
+        <!-- Score Gauge -->
+        <div class="score-gauge">
+            <div class="score-gauge-label">Confidence Score</div>
+            <div class="score-bar-container">
+                <div class="score-bar-fill"
+                     th:classappend="${match.confidenceScore() >= 0.7} ? 'high' : (${match.confidenceScore() >= 0.3} ? 'medium' : 'low')"
+                     th:style="'width: ' + ${match.confidenceScore() * 100} + '%'">
+                    <span class="score-bar-text" th:text="${#numbers.formatDecimal(match.confidenceScore() * 100, 1, 1) + '%'}">85.0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Summary -->
+        <div th:if="${match.explanation() != null and match.explanation().summary() != null}" class="explanation-text">
+            <span th:text="${match.explanation().summary()}">Human-readable explanation of the match.</span>
+        </div>
+    </div>
+
+    <!-- Side-by-Side Record Display -->
+    <h2>Raw Record Values</h2>
+    <div class="records-grid" th:if="${match.explanation() != null and match.explanation().fieldBreakdowns() != null}">
+        <div class="record-card">
+            <h3>Source A</h3>
+            <div th:each="fb : ${match.explanation().fieldBreakdowns()}" class="record-field">
+                <span class="record-field-name" th:text="${fb.fieldName()}">fieldName</span>
+                <span class="record-field-value" th:text="${fb.rawValueA() != null ? fb.rawValueA() : '—'}">value</span>
+            </div>
+        </div>
+        <div class="record-card">
+            <h3>Source B</h3>
+            <div th:each="fb : ${match.explanation().fieldBreakdowns()}" class="record-field">
+                <span class="record-field-name" th:text="${fb.fieldName()}">fieldName</span>
+                <span class="record-field-value" th:text="${fb.rawValueB() != null ? fb.rawValueB() : '—'}">value</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Per-Field Breakdown Table -->
+    <h2>Per-Field Breakdown</h2>
+    <table class="breakdown-table" th:if="${match.explanation() != null and match.explanation().fieldBreakdowns() != null}">
+        <thead>
+        <tr>
+            <th>Field Name</th>
+            <th>Raw Value A</th>
+            <th>Raw Value B</th>
+            <th>Normalization</th>
+            <th>Similarity Method</th>
+            <th>Similarity Score</th>
+            <th>Score Contribution</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="fb : ${match.explanation().fieldBreakdowns()}"
+            th:classappend="${fb.similarityResult() >= 0.7} ? 'field-high' : (${fb.similarityResult() < 0.3} ? 'field-low' : 'field-mid')">
+            <td th:text="${fb.fieldName()}">firstName</td>
+            <td th:text="${fb.rawValueA() != null ? fb.rawValueA() : '—'}">John</td>
+            <td th:text="${fb.rawValueB() != null ? fb.rawValueB() : '—'}">Jon</td>
+            <td th:text="${fb.normalizationApplied() != null ? fb.normalizationApplied() : 'None'}">Lowercase</td>
+            <td th:text="${fb.similarityMethod() != null ? fb.similarityMethod() : '—'}">Jaro-Winkler</td>
+            <td th:text="${#numbers.formatDecimal(fb.similarityResult(), 1, 3)}">0.925</td>
+            <td th:text="${#numbers.formatDecimal(fb.scoreContribution(), 1, 3)}">0.185</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Ambiguity Reasons -->
+    <div th:if="${match.explanation() != null and match.explanation().ambiguous()}" class="ambiguity-section">
+        <h3>&#9888; Ambiguity Reasons</h3>
+        <ul class="ambiguity-reasons" th:if="${match.explanation().ambiguityReasons() != null and !match.explanation().ambiguityReasons().isEmpty()}">
+            <li th:each="reason : ${match.explanation().ambiguityReasons()}" th:text="${reason}">Reason text</li>
+        </ul>
+    </div>
+
+    <!-- Back Link -->
+    <a class="back-link" th:href="@{/ui/results/{jid}(jid=${jobId})}">&larr; Back to Results</a>
+</div>
+</body>
+</html>

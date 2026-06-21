@@ -132,4 +132,28 @@ public class ReconcilerWebController {
         model.addAttribute("jobId", jobId);
         return "results";
     }
+
+    /**
+     * Renders the match detail page for a specific match candidate within a job's results.
+     * If the jobId is not found, redirects to input. If the index is out of range, redirects to results.
+     */
+    @GetMapping("/results/{jobId}/match/{index}")
+    public String showMatchDetail(@PathVariable String jobId, @PathVariable int index,
+                                  Model model, RedirectAttributes redirectAttributes) {
+        ReconciliationResponse response = resultStore.get(jobId);
+        if (response == null) {
+            redirectAttributes.addFlashAttribute("error", "No results found for job ID: " + jobId + ". The results may have expired.");
+            return "redirect:/ui/input";
+        }
+
+        if (response.matches() == null || index < 0 || index >= response.matches().size()) {
+            redirectAttributes.addFlashAttribute("error", "Invalid match index: " + index);
+            return "redirect:/ui/results/" + jobId;
+        }
+
+        model.addAttribute("match", response.matches().get(index));
+        model.addAttribute("jobId", jobId);
+        model.addAttribute("matchIndex", index);
+        return "match-detail";
+    }
 }
