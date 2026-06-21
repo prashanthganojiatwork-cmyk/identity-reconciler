@@ -177,10 +177,12 @@ public class DefaultFieldComparator implements FieldComparator {
             ));
             missingFields.add(fieldName);
         } else if (aEmpty || bEmpty) {
-            // One value is null/empty and the other is not — present with similarity 0.0
+            // One value is null/empty and the other is not — mark as NOT present
+            // Per Req 3.6: missing fields should not penalize or reward the score;
+            // weights are redistributed among fields where both records have data.
             String comparisonMethod = aEmpty
-                    ? "Source A value missing"
-                    : "Source B value missing";
+                    ? "Source A value missing — excluded from scoring"
+                    : "Source B value missing — excluded from scoring";
             fieldScores.add(new FieldScore(
                     fieldName,
                     0.0,
@@ -189,8 +191,9 @@ public class DefaultFieldComparator implements FieldComparator {
                     normalizedA,
                     normalizedB,
                     comparisonMethod,
-                    true
+                    false
             ));
+            missingFields.add(fieldName);
         } else {
             // Both values are present — compute similarity using the strategy
             double similarity = strategy.computeSimilarity(normalizedA, normalizedB);

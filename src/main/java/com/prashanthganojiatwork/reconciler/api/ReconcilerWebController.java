@@ -48,6 +48,14 @@ public class ReconcilerWebController {
     }
 
     /**
+     * Renders the sample datasets showcase page.
+     */
+    @GetMapping("/datasets")
+    public String showDatasets(Model model) {
+        return "datasets";
+    }
+
+    /**
      * Handles form submission: parses JSON from textareas, builds a ReconciliationRequest,
      * calls the orchestrator, stores results, and redirects to the results page.
      * On parse error, re-renders the input form with an error message.
