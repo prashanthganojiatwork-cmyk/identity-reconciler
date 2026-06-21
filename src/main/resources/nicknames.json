@@ -1,0 +1,29 @@
+{
+  "mappings": [
+    { "canonical": "William", "nicknames": ["Bill", "Billy", "Will", "Willy", "Liam"] },
+    { "canonical": "Robert", "nicknames": ["Bob", "Bobby", "Rob", "Robbie", "Bert"] },
+    { "canonical": "James", "nicknames": ["Jim", "Jimmy", "Jamie", "Jas"] },
+    { "canonical": "Michael", "nicknames": ["Mike", "Mikey", "Mick"] },
+    { "canonical": "Richard", "nicknames": ["Rich", "Rick", "Ricky", "Dick"] },
+    { "canonical": "Thomas", "nicknames": ["Tom", "Tommy"] },
+    { "canonical": "Elizabeth", "nicknames": ["Liz", "Beth", "Lizzy", "Betty", "Eliza"] },
+    { "canonical": "Margaret", "nicknames": ["Maggie", "Meg", "Peggy", "Marge"] },
+    { "canonical": "Jennifer", "nicknames": ["Jen", "Jenny"] },
+    { "canonical": "Katherine", "nicknames": ["Kate", "Kathy", "Katie", "Kat"] },
+    { "canonical": "Patricia", "nicknames": ["Pat", "Patty", "Trish"] },
+    { "canonical": "Joseph", "nicknames": ["Joe", "Joey"] },
+    { "canonical": "Daniel", "nicknames": ["Dan", "Danny"] },
+    { "canonical": "Edward", "nicknames": ["Ed", "Eddie", "Ted", "Teddy"] },
+    { "canonical": "Alexander", "nicknames": ["Alex", "Al", "Xander"] },
+    { "canonical": "Benjamin", "nicknames": ["Ben", "Benny"] },
+    { "canonical": "Christopher", "nicknames": ["Chris", "Topher"] },
+    { "canonical": "Jonathan", "nicknames": ["Jon", "Johnny"] },
+    { "canonical": "Anthony", "nicknames": ["Tony"] },
+    { "canonical": "Timothy", "nicknames": ["Tim", "Timmy"] },
+    { "canonical": "Matthew", "nicknames": ["Matt", "Matty"] },
+    { "canonical": "Andrew", "nicknames": ["Andy", "Drew"] },
+    { "canonical": "Nicholas", "nicknames": ["Nick", "Nicky"] },
+    { "canonical": "Samuel", "nicknames": ["Sam", "Sammy"] },
+    { "canonical": "David", "nicknames": ["Dave", "Davy"] }
+  ]
+}
