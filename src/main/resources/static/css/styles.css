@@ -445,6 +445,13 @@ footer {
     font-size: 0.8rem;
 }
 
+/* Responsive Table Wrapper */
+.table-responsive,
+.detail-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header-container,
@@ -452,6 +459,18 @@ footer {
     main,
     .footer-container {
         padding: 0 1rem;
+    }
+
+    header {
+        padding: 1rem;
+    }
+
+    nav {
+        padding: 0.75rem 1rem;
+    }
+
+    .app-title {
+        font-size: 1.25rem;
     }
 
     .form-row {
@@ -465,6 +484,7 @@ footer {
     .metadata-bar {
         flex-direction: column;
         gap: 0.75rem;
+        padding: 1rem;
     }
 
     .metadata-item {
@@ -472,6 +492,100 @@ footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    /* Results table: card-based layout on mobile */
+    .results-table thead {
+        display: none;
+    }
+
+    .results-table tbody tr {
+        display: block;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        border-left-width: 4px;
+    }
+
+    .results-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0.5rem;
+        border-bottom: none;
+        font-size: 0.85rem;
+    }
+
+    .results-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--color-text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+
+    /* Filter bar scrollable on mobile */
+    .filter-bar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.25rem;
+    }
+
+    .filter-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Score gauge stacked */
+    .score-gauge {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .score-gauge .score-bar {
+        width: 100%;
+    }
+
+    /* Card padding adjustment */
+    .card {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    /* Button full-width on mobile */
+    .btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Datasets grid single column on small screens */
+    .sample-datasets {
+        grid-template-columns: 1fr;
+    }
+
+    /* Textarea height reduction on mobile */
+    textarea {
+        min-height: 120px;
+    }
+
+    /* Footer padding */
+    footer {
+        padding: 1rem;
+    }
+
+    /* Detail page table scrollable */
+    .detail-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }
 

@@ -46,43 +46,45 @@
 
         <!-- Results Table -->
         <div class="card" th:if="${response.matches() != null and !response.matches().isEmpty()}">
-            <table>
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Source A ID</th>
-                    <th>Source B ID</th>
-                    <th>Score</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="match, iterStat : ${response.matches()}"
-                    th:classappend="${match.status() == 'match'} ? 'match' : (${match.status() == 'review'} ? 'review' : 'ambiguous')"
-                    th:attr="data-status=${match.status()}">
-                    <td th:text="${iterStat.index + 1}">1</td>
-                    <td th:text="${match.sourceARecordId()}">A-001</td>
-                    <td th:text="${match.sourceBRecordId()}">B-001</td>
-                    <td>
-                        <span class="score-badge"
-                              th:classappend="${match.confidenceScore() >= 0.7} ? 'high' : (${match.confidenceScore() >= 0.4} ? 'medium' : 'low')"
-                              th:text="${#numbers.formatDecimal(match.confidenceScore(), 1, 2)}">0.85</span>
-                    </td>
-                    <td>
-                        <span class="score-badge"
-                              th:classappend="${match.status() == 'match'} ? 'high' : (${match.status() == 'review'} ? 'medium' : 'low')"
-                              th:text="${match.status()}">match</span>
-                    </td>
-                    <td>
-                        <a style="color: var(--color-accent); text-decoration: none; font-weight: 500;"
-                           th:href="@{/ui/results/{jid}/match/{idx}(jid=${jobId}, idx=${iterStat.index})}">
-                            View Details &rarr;
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="results-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Source A ID</th>
+                        <th>Source B ID</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="match, iterStat : ${response.matches()}"
+                        th:classappend="${match.status() == 'match'} ? 'match' : (${match.status() == 'review'} ? 'review' : 'ambiguous')"
+                        th:attr="data-status=${match.status()}">
+                        <td data-label="#" th:text="${iterStat.index + 1}">1</td>
+                        <td data-label="Source A" th:text="${match.sourceARecordId()}">A-001</td>
+                        <td data-label="Source B" th:text="${match.sourceBRecordId()}">B-001</td>
+                        <td data-label="Score">
+                            <span class="score-badge"
+                                  th:classappend="${match.confidenceScore() >= 0.7} ? 'high' : (${match.confidenceScore() >= 0.4} ? 'medium' : 'low')"
+                                  th:text="${#numbers.formatDecimal(match.confidenceScore(), 1, 2)}">0.85</span>
+                        </td>
+                        <td data-label="Status">
+                            <span class="score-badge"
+                                  th:classappend="${match.status() == 'match'} ? 'high' : (${match.status() == 'review'} ? 'medium' : 'low')"
+                                  th:text="${match.status()}">match</span>
+                        </td>
+                        <td data-label="Actions">
+                            <a style="color: var(--color-accent); text-decoration: none; font-weight: 500;"
+                               th:href="@{/ui/results/{jid}/match/{idx}(jid=${jobId}, idx=${iterStat.index})}">
+                                View Details &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Empty State -->
