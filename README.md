@@ -46,9 +46,10 @@ docker run -p 8080:8080 identity-reconciler
 ## Architecture
 
 ## Links:
-- API DOC: [APIDOC.md](./APIDOC.md).
-- LLD DOC: [LLD.md](./LLD.md).
-- HLD DOC: [HLD.md](./HLD.md).
+- API DOC: [APIDOC.md](./APIDOC.md)
+- LLD DOC: [LLD.md](./LLD.md)
+- HLD DOC: [HLD.md](./HLD.md)
+- AI USAGE APPENDIX: [AI_USAGE_APPENDIX.md](./AI_USAGE_APPENDIX.md)
 
 ### System Architecture
 
