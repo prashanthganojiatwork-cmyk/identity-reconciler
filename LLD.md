@@ -1,4 +1,4 @@
-# Design Document: Identity Reconciler — POC
+# Design Document: Identity Reconciler - POC
 
 ## Overview
 
@@ -10,7 +10,7 @@ The POC is a single-process, in-memory Java Spring Boot service deployed on AWS 
 
 ### Design Approach
 
-**Interface-Driven Component Architecture** — Each component behind a Java interface, wired via Spring DI, communicating via DTOs. This satisfies the component boundary requirement, provides a clear mapping to the scale design, and is idiomatic Spring Boot.
+**Interface-Driven Component Architecture** - Each component behind a Java interface, wired via Spring DI, communicating via DTOs. This satisfies the component boundary requirement, provides a clear mapping to the scale design, and is idiomatic Spring Boot.
 
 ---
 
@@ -185,7 +185,59 @@ public record NormalizedRecord(
 | Address | Concatenate structured fields, lowercase, expand USPS abbreviations (St→Street, Ave→Avenue, etc.), collapse whitespace |
 | DOB | Parse multiple formats → ISO 8601 (YYYY-MM-DD) |
 
-### Component 2: Field Comparator
+### Component 2: Blocking Engine
+
+**Interface:**
+
+```java
+package reconciler.blocking;
+
+public interface BlockingEngine {
+    BlockingResult generateCandidatePairs(
+        List<NormalizedRecord> sourceA, 
+        List<NormalizedRecord> sourceB
+    );
+}
+
+public interface BlockingKeyGenerator {
+    Set<String> generateKeys(NormalizedRecord record);
+}
+```
+
+**DTOs:**
+
+```java
+public record BlockingResult(
+    List<CandidatePair> candidatePairs,
+    BlockingStatistics statistics
+) {}
+
+public record CandidatePair(
+    NormalizedRecord recordA,
+    NormalizedRecord recordB,
+    Set<String> sharedBlockingKeys
+) {}
+
+public record BlockingStatistics(
+    int totalBlocks,
+    double averageBlockSize,
+    int maxBlockSize,
+    long comparisonsPerformed,
+    long exhaustiveCount,
+    double reductionPercentage
+) {}
+```
+
+**Blocking Key Strategies (at least 2 independent keys per Req 6.2):**
+
+| Strategy | Key Generation | Example |
+|----------|---------------|---------|
+| Phonetic Last Name | Soundex(normalizedLastName) | "Smith" → "S530" |
+| Phone Suffix | Last 4 digits of normalized phone | "12065551234" → "1234" |
+| DOB Year | Year component of DOB | "1990-05-15" → "1990" |
+| First Name Initial + DOB Month | first char + DOB month | "John" + "05" → "J05" |
+
+### Component 3: Field Comparator
 
 **Interface:**
 
@@ -248,60 +300,6 @@ public class NameSimilarityStrategy implements FieldSimilarityStrategy {
 }
 ```
 
-### Component 3: Blocking Engine
-
-**Interface:**
-
-```java
-package reconciler.blocking;
-
-public interface BlockingEngine {
-    BlockingResult generateCandidatePairs(
-        List<NormalizedRecord> sourceA, 
-        List<NormalizedRecord> sourceB
-    );
-}
-
-public interface BlockingKeyGenerator {
-    Set<String> generateKeys(NormalizedRecord record);
-}
-```
-
-**DTOs:**
-
-```java
-public record BlockingResult(
-    List<CandidatePair> candidatePairs,
-    BlockingStatistics statistics
-) {}
-
-public record CandidatePair(
-    NormalizedRecord recordA,
-    NormalizedRecord recordB,
-    Set<String> sharedBlockingKeys
-) {}
-
-public record BlockingStatistics(
-    int totalBlocks,
-    double averageBlockSize,
-    int maxBlockSize,
-    long comparisonsPerformed,
-    long exhaustiveCount,
-    double reductionPercentage
-) {}
-```
-
-**Blocking Key Strategies (at least 2 independent keys per Req 6.2):**
-
-| Strategy | Key Generation | Example |
-|----------|---------------|---------|
-| Phonetic Last Name | Soundex(normalizedLastName) | "Smith" → "S530" |
-| Phone Suffix | Last 4 digits of normalized phone | "12065551234" → "1234" |
-| DOB Year | Year component of DOB | "1990-05-15" → "1990" |
-| First Name Initial + DOB Month | first char + DOB month | "John" + "05" → "J05" |
-
-- **Block Size Cap:** Max 100 records from one source per block. Exceeded → split using secondary key.
-- **Fallback Block:** Records missing all blocking key fields → compared against all opposing records.
 
 ### Component 4: Scoring Engine
 

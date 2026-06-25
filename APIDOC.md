@@ -1,4 +1,4 @@
-# API Documentation — Identity Reconciler
+# API Documentation - Identity Reconciler
 
 ## Base URL
 
@@ -227,11 +227,11 @@ All errors return a structured JSON body:
 
 | Path | Method | Description |
 |------|--------|-------------|
-| `/ui/input` | GET | Input form — paste JSON for Source A and Source B, configure thresholds, submit |
-| `/ui/datasets` | GET | Sample datasets — click to load pre-built test data into the input form |
-| `/ui/reconcile` | POST | Form submission handler — processes input, redirects to results |
-| `/ui/results/{jobId}` | GET | Results overview — table of match candidates with filtering |
-| `/ui/results/{jobId}/match/{index}` | GET | Match detail — side-by-side comparison, per-field breakdown, score gauge |
+| `/ui/input` | GET | Input form - paste JSON for Source A and Source B, configure thresholds, submit |
+| `/ui/datasets` | GET | Sample datasets - click to load pre-built test data into the input form |
+| `/ui/reconcile` | POST | Form submission handler - processes input, redirects to results |
+| `/ui/results/{jobId}` | GET | Results overview - table of match candidates with filtering |
+| `/ui/results/{jobId}/match/{index}` | GET | Match detail - side-by-side comparison, per-field breakdown, score gauge |
 
 ### UI Flow
 

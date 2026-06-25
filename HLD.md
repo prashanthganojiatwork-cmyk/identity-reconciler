@@ -1,10 +1,10 @@
-# Extension Design: Identity Reconciler — Scale Architecture (HLD)
+# Extension Design: Identity Reconciler - Scale Architecture (HLD)
 
 ## Overview
 
 This document describes how the POC Identity Reconciler scales to handle 200GB+ datasets and streaming workloads. Each section presents multiple approaches with tradeoffs, diagrams, and a recommended path.
 
-This is a **design-only deliverable** — no code is built for this scope.
+This is a **design-only deliverable** - no code is built for this scope.
 
 > For POC design (LLD), see [LLD.md](./LLD.md).
 
@@ -127,7 +127,7 @@ graph TD
 | Cost | Medium (OpenSearch cluster) | Low (compute only) | Medium (RCU/WCU) |
 | Trestle stack fit | Strong (already using OpenSearch) | N/A | Partial |
 
-**Recommendation: Approach A.** LSH provides tunable precision/recall tradeoff and supports fuzzy blocking — important for messy identity data. OpenSearch is already in Trestle's stack.
+**Recommendation: Approach A.** LSH provides tunable precision/recall tradeoff and supports fuzzy blocking - important for messy identity data. OpenSearch is already in Trestle's stack.
 
 ---
 
